@@ -175,6 +175,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Améliorer l'UX avec un calendrier centré et mobile-friendly.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Correction validation calendrier : jours terminés marqués correctement, bouton test ajouté, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (logique corrigée), GitHub (poussé).
+- **Pourquoi** : Résoudre le problème de validation des jours terminés.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

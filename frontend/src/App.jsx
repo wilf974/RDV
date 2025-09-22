@@ -147,17 +147,6 @@ function App() {
     }
   };
 
-  // Fonction pour tester : marquer un jour comme terminé manuellement
-  const testCompleteDay = (dayIndex) => {
-    const startDate = new Date('2025-09-22');
-    const testDay = new Date(startDate);
-    testDay.setDate(startDate.getDate() + dayIndex);
-    const dayStr = testDay.toISOString().split('T')[0];
-    const newCompletedDays = [...completedDays, dayStr];
-    setCompletedDays(newCompletedDays);
-    localStorage.setItem('completedDays', JSON.stringify(newCompletedDays));
-  };
-
   // Générer les jours du challenge (14 jours : 22/09 au 05/10)
   const startDate = new Date('2025-09-22');
   const days = [];
@@ -189,7 +178,6 @@ function App() {
             <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1}>
               Suivant
             </button>
-            <button onClick={() => testCompleteDay(0)}>Test Jour 1</button>
           </div>
           <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur pour cet appareil.</p>
           <h3>Calendrier des 14 Jours (22/09 - 05/10)</h3>
