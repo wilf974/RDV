@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Service Frontend (React)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "12000:12000"
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_URL=http://localhost:12001
+
+  # Service Backend (Node.js)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "12001:12001"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=jeunepriere_db
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+
+  # Service Base de Données (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=jeunepriere_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
