@@ -30,9 +30,9 @@ app.get('/api/test', (req, res) => {
 
 // Route pour sauvegarder les moments terminés
 app.post('/api/progress', async (req, res) => {
-  const { userId, completedMoments } = req.body;
+  const { userId, completedMoments, completedDays } = req.body;
   try {
-    await pool.query('INSERT INTO progress (user_id, completed_moments) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET completed_moments = $2', [userId, JSON.stringify(completedMoments)]);
+    await pool.query('INSERT INTO progress (user_id, completed_moments, completed_days) VALUES ($1, $2, $3) ON CONFLICT (user_id) DO UPDATE SET completed_moments = $2, completed_days = $3', [userId, JSON.stringify(completedMoments), JSON.stringify(completedDays)]);
     res.json({ success: true });
   } catch (err) {
     console.error(err);
@@ -44,11 +44,11 @@ app.post('/api/progress', async (req, res) => {
 app.get('/api/progress/:userId', async (req, res) => {
   const { userId } = req.params;
   try {
-    const result = await pool.query('SELECT completed_moments FROM progress WHERE user_id = $1', [userId]);
+    const result = await pool.query('SELECT completed_moments, completed_days FROM progress WHERE user_id = $1', [userId]);
     if (result.rows.length > 0) {
-      res.json(JSON.parse(result.rows[0].completed_moments));
+      res.json({ completedMoments: JSON.parse(result.rows[0].completed_moments || '[]'), completedDays: JSON.parse(result.rows[0].completed_days || '[]') });
     } else {
-      res.json([]);
+      res.json({ completedMoments: [], completedDays: [] });
     }
   } catch (err) {
     console.error(err);
