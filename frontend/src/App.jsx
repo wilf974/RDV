@@ -12,7 +12,11 @@ function App() {
   const [timeLeft, setTimeLeft] = useState(60); // 1 minute en secondes
   const [isActive, setIsActive] = useState(false);
   const [completedMoments, setCompletedMoments] = useState([]);
-  const userId = 'user1'; // Clé utilisateur anonyme (peut être générée)
+  const [pseudo, setPseudo] = useState(() => {
+    const saved = localStorage.getItem('pseudo');
+    return saved || '';
+  });
+  const [userId, setUserId] = useState('');
 
   const moments = [
     { title: "Moment 1", text: "Psaume 23:1 - L'Éternel est mon berger, je ne manquerai de rien." },
@@ -25,12 +29,18 @@ function App() {
   ];
 
   useEffect(() => {
-    document.title = 'Jeûne et Prière 2026';
-    // Charger les moments terminés depuis l'API
-    fetch(`http://localhost:12001/api/progress/${userId}`)
-      .then(res => res.json())
-      .then(data => setCompletedMoments(data));
+    if (pseudo) {
+      setUserId(pseudo);
+      localStorage.setItem('pseudo', pseudo);
+      // Charger les moments terminés depuis l'API
+      fetch(`http://localhost:12001/api/progress/${pseudo}`)
+        .then(res => res.json())
+        .then(data => setCompletedMoments(data));
+    }
+  }, [pseudo]);
 
+  useEffect(() => {
+    document.title = 'Jeûne et Prière 2026';
     let interval = null;
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
@@ -41,11 +51,13 @@ function App() {
             const newCompleted = [...completedMoments, currentMoment];
             setCompletedMoments(newCompleted);
             // Sauvegarder sur l'API
-            fetch('http://localhost:12001/api/progress', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId, completedMoments: newCompleted })
-            });
+            if (userId) {
+              fetch('http://localhost:12001/api/progress', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, completedMoments: newCompleted })
+              });
+            }
           }
           return timeLeft - 1;
         });
@@ -75,19 +87,33 @@ function App() {
     <div className="app">
       <h1>🙏 21 Jours de CÉLÉBRATIONS À L’ÉTERNEL</h1>
       <p>21 Sept. au 12 Oct. 2025 - Célébrer : Faire, Chanter, Jeter, Briller, Fêter, Danser, Pèlerinage</p>
-      <p className="moment-counter">Moment {currentMoment + 1}/7 {completedMoments.includes(currentMoment) ? '✅ Terminé' : ''}</p>
-      <h2>{moments[currentMoment].title}</h2>
-      <p>{moments[currentMoment].text}</p>
-      <p className="timer">Temps restant : {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
-      <div className="buttons">
-        <button onClick={startTimer} disabled={isActive || completedMoments.includes(currentMoment)}>
-          Démarrer
-        </button>
-        <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1}>
-          Suivant
-        </button>
+      <div style={{ marginBottom: '1rem' }}>
+        <label>Pseudo : </label>
+        <input
+          type="text"
+          value={pseudo}
+          onChange={(e) => setPseudo(e.target.value)}
+          placeholder="Entrez votre pseudo"
+          style={{ padding: '5px', marginLeft: '10px' }}
+        />
       </div>
-      <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur.</p>
+      {pseudo && (
+        <>
+          <p className="moment-counter">Moment {currentMoment + 1}/7 {completedMoments.includes(currentMoment) ? '✅ Terminé' : ''}</p>
+          <h2>{moments[currentMoment].title}</h2>
+          <p>{moments[currentMoment].text}</p>
+          <p className="timer">Temps restant : {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
+          <div className="buttons">
+            <button onClick={startTimer} disabled={isActive || completedMoments.includes(currentMoment)}>
+              Démarrer
+            </button>
+            <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1}>
+              Suivant
+            </button>
+          </div>
+          <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur pour {pseudo}.</p>
+        </>
+      )}
     </div>
   );
 }
