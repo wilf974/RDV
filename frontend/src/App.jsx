@@ -24,7 +24,13 @@ function App() {
     let interval = null;
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft(timeLeft => timeLeft - 1);
+        setTimeLeft(timeLeft => {
+          if (timeLeft === 1) {
+            // Notification quand le timer arrive à zéro
+            alert("Temps écoulé ! Passez au moment suivant.");
+          }
+          return timeLeft - 1;
+        });
       }, 1000);
     } else if (timeLeft === 0) {
       setIsActive(false);
@@ -46,17 +52,19 @@ function App() {
   return (
     <div className="app">
       <h1>🙏 Moments de Prière 2026</h1>
-      <p>Moment {currentMoment + 1}/7</p>
+      <p className="moment-counter">Moment {currentMoment + 1}/7</p>
       <h2>{moments[currentMoment].title}</h2>
       <p>{moments[currentMoment].text}</p>
-      <p>Temps restant : {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
-      <button onClick={startTimer} disabled={isActive}>
-        Démarrer le Moment
-      </button>
-      <button onClick={nextMoment} disabled={isActive}>
-        Moment Suivant
-      </button>
-      <p>Prochaine étape : Améliorer le styling et ajouter plus de textes.</p>
+      <p className="timer">Temps restant : {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
+      <div className="buttons">
+        <button onClick={startTimer} disabled={isActive}>
+          Démarrer le Moment
+        </button>
+        <button onClick={nextMoment} disabled={isActive}>
+          Moment Suivant
+        </button>
+      </div>
+      <p className="footer">Prochaine étape : Améliorer le styling et ajouter plus de textes.</p>
     </div>
   );
 }

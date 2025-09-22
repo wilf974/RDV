@@ -97,6 +97,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Développer les fonctionnalités de l'application.
 - **Section Concernée** : Développement Frontend.
 
+### 2024-09-22
+- **Action** : Modification de App.jsx pour ajouter la logique des 7 moments de prière avec textes bibliques et timer, puis push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (modifié), GitHub (poussé).
+- **Pourquoi** : Implémenter les fonctionnalités principales de l'application.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*
