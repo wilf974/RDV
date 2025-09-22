@@ -136,6 +136,7 @@ function App() {
     localStorage.setItem('completedMoments', JSON.stringify(newCompleted));
     // Si tous les moments du jour sont terminés, marquer le jour comme terminé et passer au suivant
     if (newCompleted.length === moments.length) {
+      console.log('Tous les moments terminés, validation du jour :', currentDay);
       const newCompletedDays = [...completedDays, currentDay];
       setCompletedDays(newCompletedDays);
       localStorage.setItem('completedDays', JSON.stringify(newCompletedDays));
@@ -150,8 +151,8 @@ function App() {
     }
   };
 
-  // Générer les jours du challenge (14 jours : 22/09 au 05/10)
-  const startDate = new Date('2025-09-22');
+  // Générer les jours du challenge (14 jours : aujourd'hui au +13 jours pour tests)
+  const startDate = new Date();
   const days = [];
   for (let i = 0; i < 14; i++) {
     const day = new Date(startDate);

@@ -187,6 +187,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Simplifier l'interface avec validation automatique.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Correction validation auto et layout calendrier : 3-4 jours par ligne sur mobile, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (logique ajustée), frontend/src/index.css (CSS mobile), GitHub (poussé).
+- **Pourquoi** : Résoudre la validation automatique et améliorer l'affichage mobile.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*
