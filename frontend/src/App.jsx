@@ -21,6 +21,15 @@ function App() {
     return id;
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [currentDay, setCurrentDay] = useState(() => {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const saved = localStorage.getItem('currentDay');
+    return saved || today;
+  });
+  const [completedMoments, setCompletedMoments] = useState(() => {
+    const saved = localStorage.getItem('completedMoments');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const moments = [
     {
@@ -79,6 +88,7 @@ function App() {
             alert("Temps écoulé ! Moment terminé.");
             const newCompleted = [...completedMoments, currentMoment];
             setCompletedMoments(newCompleted);
+            localStorage.setItem('completedMoments', JSON.stringify(newCompleted));
             // Sauvegarder sur l'API
             if (userId) {
               fetch('http://localhost:12001/api/progress', {
@@ -87,6 +97,7 @@ function App() {
                 body: JSON.stringify({ userId, completedMoments: newCompleted })
               });
             }
+            markMomentCompleted();
           }
           return timeLeft - 1;
         });
@@ -112,6 +123,34 @@ function App() {
     }
   };
 
+  const markMomentCompleted = () => {
+    const newCompleted = [...completedMoments, currentMoment];
+    setCompletedMoments(newCompleted);
+    localStorage.setItem('completedMoments', JSON.stringify(newCompleted));
+    // Si tous les moments du jour sont terminés, passer au jour suivant
+    if (newCompleted.length === moments.length) {
+      const nextDay = new Date(currentDay);
+      nextDay.setDate(nextDay.getDate() + 1);
+      const nextDayStr = nextDay.toISOString().split('T')[0];
+      setCurrentDay(nextDayStr);
+      localStorage.setItem('currentDay', nextDayStr);
+      setCurrentMoment(0);
+      localStorage.setItem('currentMoment', 0);
+      alert('Félicitations ! Tous les moments terminés. Jour suivant débloqué.');
+    }
+  };
+
+  // Générer les jours du challenge (21 jours)
+  const startDate = new Date('2025-09-21');
+  const days = [];
+  for (let i = 0; i < 21; i++) {
+    const day = new Date(startDate);
+    day.setDate(startDate.getDate() + i);
+    const dayStr = day.toISOString().split('T')[0];
+    const isCompleted = completedMoments.length === moments.length && currentDay >= dayStr;
+    days.push({ date: dayStr, isCompleted });
+  }
+
   return (
     <div className="app">
       <h1>🙏 21 Jours de CÉLÉBRATIONS À L’ÉTERNEL</h1>
@@ -134,6 +173,23 @@ function App() {
             </button>
           </div>
           <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur pour cet appareil.</p>
+          <h3>Calendrier des 21 Jours</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '10px', margin: '20px 0' }}>
+            {days.map((day, index) => (
+              <div
+                key={day.date}
+                style={{
+                  padding: '10px',
+                  backgroundColor: day.isCompleted ? '#4caf50' : '#f1f1f1',
+                  color: day.isCompleted ? 'white' : 'black',
+                  borderRadius: '5px',
+                  textAlign: 'center'
+                }}
+              >
+                Jour {index + 1} ({day.date})
+              </div>
+            ))}
+          </div>
         </>
       )}
     </div>

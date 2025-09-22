@@ -145,6 +145,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Simplifier la persistance sans saisie, chaque appareil stocke ses données.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Extension des textes bibliques aux versets entiers pour tous les moments, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (textes étendus), GitHub (poussé).
+- **Pourquoi** : Enrichir le contenu avec des versets complets pour plus de profondeur.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*
