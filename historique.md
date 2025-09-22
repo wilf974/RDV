@@ -169,6 +169,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Intégrer le thème des 21 Jours de Célébrations avec des versets complets.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Calendrier amélioré : 14 jours, responsive, validation visuelle avec checkmark, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (calendrier limité), frontend/src/index.css (CSS responsive ajouté), GitHub (poussé).
+- **Pourquoi** : Améliorer l'UX avec un calendrier centré et mobile-friendly.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*
