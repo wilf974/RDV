@@ -96,3 +96,70 @@ button:disabled {
   font-size: 0.9rem;
   color: #95a5a6;
 }
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+  margin: 20px auto;
+  max-width: 600px;
+  justify-items: center;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  min-width: 80px;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.day.completed {
+  background-color: #4caf50;
+  color: white;
+}
+
+.day-number {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.day-date {
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+.check {
+  font-size: 1.2rem;
+  margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+  .calendar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+  }
+
+  .day {
+    min-width: 60px;
+    padding: 8px;
+  }
+
+  .day-number {
+    font-size: 0.9rem;
+  }
+
+  .day-date {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar {
+    grid-template-columns: 1fr;
+  }
+}

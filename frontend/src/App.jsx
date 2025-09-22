@@ -147,10 +147,10 @@ function App() {
     }
   };
 
-  // Générer les jours du challenge (21 jours)
-  const startDate = new Date('2025-09-21');
+  // Générer les jours du challenge (14 jours : 22/09 au 05/10)
+  const startDate = new Date('2025-09-22');
   const days = [];
-  for (let i = 0; i < 21; i++) {
+  for (let i = 0; i < 14; i++) {
     const day = new Date(startDate);
     day.setDate(startDate.getDate() + i);
     const dayStr = day.toISOString().split('T')[0];
@@ -180,20 +180,16 @@ function App() {
             </button>
           </div>
           <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur pour cet appareil.</p>
-          <h3>Calendrier des 21 Jours</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '10px', margin: '20px 0' }}>
+          <h3>Calendrier des 14 Jours (22/09 - 05/10)</h3>
+          <div className="calendar">
             {days.map((day, index) => (
               <div
                 key={day.date}
-                style={{
-                  padding: '10px',
-                  backgroundColor: day.isCompleted ? '#4caf50' : '#f1f1f1',
-                  color: day.isCompleted ? 'white' : 'black',
-                  borderRadius: '5px',
-                  textAlign: 'center'
-                }}
+                className={`day ${day.isCompleted ? 'completed' : ''}`}
               >
-                Jour {index + 1} ({day.date})
+                <span className="day-number">Jour {index + 1}</span>
+                <span className="day-date">{day.date}</span>
+                {day.isCompleted && <span className="check">✓</span>}
               </div>
             ))}
           </div>
