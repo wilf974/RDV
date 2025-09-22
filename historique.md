@@ -151,6 +151,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Enrichir le contenu avec des versets complets pour plus de profondeur.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Ajout calendrier et système de jours : persistance par jour, déblocage automatique du suivant, visualisation en vert, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (calendrier ajouté), GitHub (poussé).
+- **Pourquoi** : Suivre la progression sur 21 jours avec déblocage quotidien.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

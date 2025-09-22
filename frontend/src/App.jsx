@@ -11,7 +11,10 @@ function App() {
   });
   const [timeLeft, setTimeLeft] = useState(60); // 1 minute en secondes
   const [isActive, setIsActive] = useState(false);
-  const [completedMoments, setCompletedMoments] = useState([]);
+  const [completedMoments, setCompletedMoments] = useState(() => {
+    const saved = localStorage.getItem('completedMoments');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [userId, setUserId] = useState(() => {
     let id = localStorage.getItem('userId');
     if (!id) {
@@ -25,10 +28,6 @@ function App() {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const saved = localStorage.getItem('currentDay');
     return saved || today;
-  });
-  const [completedMoments, setCompletedMoments] = useState(() => {
-    const saved = localStorage.getItem('completedMoments');
-    return saved ? JSON.parse(saved) : [];
   });
 
   const moments = [
