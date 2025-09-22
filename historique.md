@@ -109,6 +109,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Rendre l'application plus attrayante et interactive.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Intégration du thème 21 Jours de Célébrations : sections matins, soirs, veillées, reconnaissances, textes bibliques étendus, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (thème intégré), GitHub (poussé).
+- **Pourquoi** : Adapter l'application au thème spécifique du jeûne et prière.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*
