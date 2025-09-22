@@ -68,7 +68,7 @@ function App() {
   useEffect(() => {
     setIsLoading(true);
     // Charger les moments terminés depuis l'API
-    fetch(`http://localhost:12001/api/progress/${userId}`)
+    fetch(`http://srv819544.hstgr.cloud:12001/api/progress/${userId}`)
       .then(res => res.json())
       .then(data => {
         setCompletedMoments(data.completedMoments || []);
@@ -95,7 +95,7 @@ function App() {
             localStorage.setItem('completedMoments', JSON.stringify(newCompleted));
             // Sauvegarder sur l'API
             if (userId) {
-              fetch('http://localhost:12001/api/progress', {
+              fetch('http://srv819544.hstgr.cloud:12001/api/progress', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, completedMoments: newCompleted, completedDays })
