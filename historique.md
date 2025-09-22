@@ -139,6 +139,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Permettre à plusieurs utilisateurs de sauvegarder leur progression individuellement.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Remplacement pseudo par ID appareil : persistance automatique par appareil via localStorage, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (ID automatique ajouté), GitHub (poussé).
+- **Pourquoi** : Simplifier la persistance sans saisie, chaque appareil stocke ses données.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

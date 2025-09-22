@@ -23,13 +23,34 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   const moments = [
-    { title: "Moment 1", text: "Psaume 23:1 - L'Éternel est mon berger, je ne manquerai de rien." },
-    { title: "Moment 2", text: "Matthieu 6:33 - Cherchez premièrement le royaume de Dieu." },
-    { title: "Moment 3", text: "Philippiens 4:13 - Je peux tout par celui qui me fortifie." },
-    { title: "Moment 4", text: "Josué 1:9 - Sois fort et courageux." },
-    { title: "Moment 5", text: "Psaume 46:10 - Arrêtez, et sachez que je suis Dieu." },
-    { title: "Moment 6", text: "Romains 8:28 - Toutes choses concourent au bien." },
-    { title: "Moment 7", text: "Jean 14:6 - Je suis le chemin, la vérité, et la vie." }
+    {
+      title: "Moment 1",
+      text: "Psaume 23:1-6 - L'Éternel est mon berger: je ne manquerai de rien. Il me fait reposer dans de verts pâturages, il me dirige près des eaux paisibles. Il restaure mon âme, il me conduit dans les sentiers de la justice, à cause de son nom. Quand je marche dans la vallée de l'ombre de la mort, je ne crains aucun mal, car tu es avec moi: ta houlette et ton bâton me rassurent. Tu dresses devant moi une table, en face de mes adversaires; tu oins d'huile ma tête, et ma coupe déborde. Oui, le bonheur et la grâce m'accompagneront tous les jours de ma vie, et j'habiterai dans la maison de l'Éternel jusqu'à la fin de mes jours."
+    },
+    {
+      title: "Moment 2",
+      text: "Matthieu 6:33 - Cherchez premièrement le royaume et la justice de Dieu; et toutes ces choses vous seront données par-dessus."
+    },
+    {
+      title: "Moment 3",
+      text: "Philippiens 4:13 - Je peux tout par celui qui me fortifie."
+    },
+    {
+      title: "Moment 4",
+      text: "Josué 1:9 - Ne t'ai-je pas donné cet ordre: Fortifie-toi et prends courage? Ne t'effraie point et ne t'épouvante point, car l'Éternel, ton Dieu, est avec toi dans tout ce que tu entreprendras."
+    },
+    {
+      title: "Moment 5",
+      text: "Psaume 46:10 - Arrêtez, et sachez que je suis Dieu: je domine sur les nations, je domine sur la terre."
+    },
+    {
+      title: "Moment 6",
+      text: "Romains 8:28 - Nous savons, du reste, que toutes choses concourent au bien de ceux qui aiment Dieu, de ceux qui sont appelés selon son dessein."
+    },
+    {
+      title: "Moment 7",
+      text: "Jean 14:6 - Jésus lui dit: Je suis le chemin, la vérité, et la vie. Nul ne vient au Père que par moi."
+    }
   ];
 
   useEffect(() => {
