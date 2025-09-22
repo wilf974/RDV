@@ -1,10 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
+const cors = require('cors');
 
 /**
  * Serveur Express pour l'API de Jeûne et Prière 2026.
- * Gère les connexions à la base de données et les routes de base.
+ * Gère la persistance des moments terminés via PostgreSQL.
  */
 const app = express();
 const PORT = process.env.BACKEND_PORT || 12001;
@@ -19,6 +20,7 @@ const pool = new Pool({
 });
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 
 // Route de test
@@ -26,14 +28,31 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'API de Jeûne et Prière 2026 fonctionne !' });
 });
 
-// Route pour les moments de prière (placeholder)
-app.get('/api/moments', async (req, res) => {
+// Route pour sauvegarder les moments terminés
+app.post('/api/progress', async (req, res) => {
+  const { userId, completedMoments } = req.body;
   try {
-    const result = await pool.query('SELECT * FROM moments ORDER BY id');
-    res.json(result.rows);
+    await pool.query('INSERT INTO progress (user_id, completed_moments) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET completed_moments = $2', [userId, JSON.stringify(completedMoments)]);
+    res.json({ success: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Erreur lors de la récupération des moments' });
+    res.status(500).json({ error: 'Erreur lors de la sauvegarde' });
+  }
+});
+
+// Route pour récupérer les moments terminés
+app.get('/api/progress/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const result = await pool.query('SELECT completed_moments FROM progress WHERE user_id = $1', [userId]);
+    if (result.rows.length > 0) {
+      res.json(JSON.parse(result.rows[0].completed_moments));
+    } else {
+      res.json([]);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erreur lors de la récupération' });
   }
 });
 

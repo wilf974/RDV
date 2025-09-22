@@ -115,6 +115,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Adapter l'application au thème spécifique du jeûne et prière.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Simplification interface : 7 moments uniquement, persistance localStorage pour moments terminés, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (simplifié et persistance ajoutée), GitHub (poussé).
+- **Pourquoi** : Faciliter l'usage et sauvegarder le progrès.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

@@ -2,16 +2,14 @@ import React, { useState, useEffect } from 'react';
 
 /**
  * Composant principal de l'application de Jeûne et Prière 2026.
- * Gère les 7 moments quotidiens avec persistance et timer.
+ * Gère les 7 moments quotidiens avec persistance serveur et timer.
  */
 function App() {
   const [currentMoment, setCurrentMoment] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60); // 1 minute en secondes
   const [isActive, setIsActive] = useState(false);
-  const [completedMoments, setCompletedMoments] = useState(() => {
-    const saved = localStorage.getItem('completedMoments');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [completedMoments, setCompletedMoments] = useState([]);
+  const userId = 'user1'; // Clé utilisateur anonyme (peut être générée)
 
   const moments = [
     { title: "Moment 1", text: "Psaume 23:1 - L'Éternel est mon berger, je ne manquerai de rien." },
@@ -25,6 +23,11 @@ function App() {
 
   useEffect(() => {
     document.title = 'Jeûne et Prière 2026';
+    // Charger les moments terminés depuis l'API
+    fetch(`http://localhost:12001/api/progress/${userId}`)
+      .then(res => res.json())
+      .then(data => setCompletedMoments(data));
+
     let interval = null;
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
@@ -34,7 +37,12 @@ function App() {
             alert("Temps écoulé ! Moment terminé.");
             const newCompleted = [...completedMoments, currentMoment];
             setCompletedMoments(newCompleted);
-            localStorage.setItem('completedMoments', JSON.stringify(newCompleted));
+            // Sauvegarder sur l'API
+            fetch('http://localhost:12001/api/progress', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId, completedMoments: newCompleted })
+            });
           }
           return timeLeft - 1;
         });
@@ -43,7 +51,7 @@ function App() {
       setIsActive(false);
     }
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, currentMoment, completedMoments]);
+  }, [isActive, timeLeft, currentMoment, completedMoments, userId]);
 
   const startTimer = () => {
     setTimeLeft(60);
@@ -74,7 +82,7 @@ function App() {
           Suivant
         </button>
       </div>
-      <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé localement.</p>
+      <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur.</p>
     </div>
   );
 }
