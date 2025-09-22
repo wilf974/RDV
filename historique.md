@@ -103,6 +103,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Implémenter les fonctionnalités principales de l'application.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Amélioration UI/UX : styling CSS moderne, notifications timer, organisation code, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/index.css (amélioré), frontend/src/App.jsx (ajusté), GitHub (poussé).
+- **Pourquoi** : Rendre l'application plus attrayante et interactive.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*
