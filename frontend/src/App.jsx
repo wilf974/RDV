@@ -101,7 +101,10 @@ function App() {
                 body: JSON.stringify({ userId, completedMoments: newCompleted, completedDays })
               });
             }
-            markMomentCompleted();
+            // Validation automatique du jour
+            if (newCompleted.length === moments.length) {
+              markMomentCompleted();
+            }
           }
           return timeLeft - 1;
         });

@@ -181,6 +181,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Résoudre le problème de validation des jours terminés.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Suppression bouton test : validation automatique du jour activée, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (bouton retiré), GitHub (poussé).
+- **Pourquoi** : Simplifier l'interface avec validation automatique.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*
