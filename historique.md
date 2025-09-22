@@ -37,6 +37,66 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Faciliter le lancement manuel sur Windows/VPS selon les préférences de l'utilisateur.
 - **Section Concernée** : Déploiement et Lancement.
 
+### 2024-09-22
+- **Action** : Initialisation Git, ajout des fichiers et push vers GitHub.
+- **Fichiers Impactés** : .git (initialisé), tous les fichiers ajoutés au repo.
+- **Pourquoi** : Sauvegarder le projet sur GitHub pour collaboration et déploiement.
+- **Section Concernée** : Gestion de Version.
+
+### 2024-09-22
+- **Action** : Correction des erreurs de déploiement sur VPS (génération package-lock.json, ajustement Docker).
+- **Fichiers Impactés** : package-lock.json (frontend et backend générés).
+- **Pourquoi** : Résoudre les erreurs npm ci et permettre le build Docker.
+- **Section Concernée** : Déploiement et Lancement.
+
+### 2024-09-22
+- **Action** : Guide pour créer un sous-domaine sur Hostinger et configurer Nginx sur VPS.
+- **Fichiers Impactés** : Aucun fichier modifié, conseils fournis.
+- **Pourquoi** : Rendre l'application accessible via un sous-domaine.
+- **Section Concernée** : Déploiement et Configuration.
+
+### 2024-09-22
+- **Action** : Confirmation de l'utilisation de l'IP direct srv819544.hstgr.cloud:12000 pour l'accès.
+- **Fichiers Impactés** : Aucun, décision utilisateur.
+- **Pourquoi** : Simplifier l'accès sans sous-domaine.
+- **Section Concernée** : Déploiement et Configuration.
+
+### 2024-09-22
+- **Action** : Diagnostic des erreurs de connexion (timeout et reset).
+- **Fichiers Impactés** : Aucun, conseils pour logs et ports.
+- **Pourquoi** : Résoudre les problèmes d'accès à l'application.
+- **Section Concernée** : Déploiement et Dépannage.
+
+### 2024-09-22
+- **Action** : Correction du problème de connexion au frontend (build React et Nginx).
+- **Fichiers Impactés** : Aucun, ajustements de configuration suggérés.
+- **Pourquoi** : Résoudre le reset de connexion sur le port 12000.
+- **Section Concernée** : Déploiement et Dépannage.
+
+### 2024-09-22
+- **Action** : Diagnostic et correction de l'absence de fichiers React et config Nginx.
+- **Fichiers Impactés** : Aucun, commandes pour inspection et rebuild suggérées.
+- **Pourquoi** : Résoudre les erreurs d'accès aux fichiers et config.
+- **Section Concernée** : Déploiement et Dépannage.
+
+### 2024-09-22
+- **Action** : Correction de la configuration Nginx pour écouter sur le port 12000.
+- **Fichiers Impactés** : frontend/Dockerfile (ajusté).
+- **Pourquoi** : Résoudre le reset de connexion en configurant Nginx correctement.
+- **Section Concernée** : Déploiement et Dépannage.
+
+### 2024-09-22
+- **Action** : Confirmation que l'application fonctionne sur srv819544.hstgr.cloud:12000.
+- **Fichiers Impactés** : Aucun.
+- **Pourquoi** : Vérifier le déploiement réussi.
+- **Section Concernée** : Déploiement et Test.
+
+### 2024-09-22
+- **Action** : Planification des fonctionnalités principales (7 moments de prière, textes bibliques, timer, UI).
+- **Fichiers Impactés** : Aucun, planification.
+- **Pourquoi** : Développer les fonctionnalités de l'application.
+- **Section Concernée** : Développement Frontend.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*
