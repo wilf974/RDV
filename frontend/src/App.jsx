@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 /**
  * Composant principal de l'application de Jeûne et Prière 2026.
- * Gère les 7 moments quotidiens avec persistance serveur et timer.
+ * Gère les 7 moments quotidiens avec persistance serveur via cookies.
  */
 function App() {
   const [currentMoment, setCurrentMoment] = useState(() => {
@@ -12,11 +12,14 @@ function App() {
   const [timeLeft, setTimeLeft] = useState(60); // 1 minute en secondes
   const [isActive, setIsActive] = useState(false);
   const [completedMoments, setCompletedMoments] = useState([]);
-  const [pseudo, setPseudo] = useState(() => {
-    const saved = localStorage.getItem('pseudo');
-    return saved || '';
+  const [userId, setUserId] = useState(() => {
+    let id = localStorage.getItem('userId');
+    if (!id) {
+      id = 'user_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('userId', id);
+    }
+    return id;
   });
-  const [userId, setUserId] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   const moments = [
@@ -30,25 +33,19 @@ function App() {
   ];
 
   useEffect(() => {
-    if (pseudo) {
-      setUserId(pseudo);
-      localStorage.setItem('pseudo', pseudo);
-      setIsLoading(true);
-      // Charger les moments terminés depuis l'API
-      fetch(`http://localhost:12001/api/progress/${pseudo}`)
-        .then(res => res.json())
-        .then(data => {
-          setCompletedMoments(data);
-          setIsLoading(false);
-        })
-        .catch(err => {
-          console.error('Erreur chargement :', err);
-          setIsLoading(false);
-        });
-    } else {
-      setIsLoading(false);
-    }
-  }, [pseudo]);
+    setIsLoading(true);
+    // Charger les moments terminés depuis l'API
+    fetch(`http://localhost:12001/api/progress/${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        setCompletedMoments(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Erreur chargement :', err);
+        setIsLoading(false);
+      });
+  }, [userId]);
 
   useEffect(() => {
     document.title = 'Jeûne et Prière 2026';
@@ -98,37 +95,24 @@ function App() {
     <div className="app">
       <h1>🙏 21 Jours de CÉLÉBRATIONS À L’ÉTERNEL</h1>
       <p>21 Sept. au 12 Oct. 2025 - Célébrer : Faire, Chanter, Jeter, Briller, Fêter, Danser, Pèlerinage</p>
-      <div style={{ marginBottom: '1rem' }}>
-        <label>Pseudo : </label>
-        <input
-          type="text"
-          value={pseudo}
-          onChange={(e) => setPseudo(e.target.value)}
-          placeholder="Entrez votre pseudo"
-          style={{ padding: '5px', marginLeft: '10px' }}
-        />
-      </div>
-      {pseudo && (
+      <p style={{ fontSize: '0.9rem', color: '#7f8c8d' }}>ID Appareil : {userId}</p>
+      {isLoading ? (
+        <p>Chargement des données...</p>
+      ) : (
         <>
-          {isLoading ? (
-            <p>Chargement des données...</p>
-          ) : (
-            <>
-              <p className="moment-counter">Moment {currentMoment + 1}/7 {completedMoments.includes(currentMoment) ? '✅ Terminé' : ''}</p>
-              <h2>{moments[currentMoment].title}</h2>
-              <p>{moments[currentMoment].text}</p>
-              <p className="timer">Temps restant : {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
-              <div className="buttons">
-                <button onClick={startTimer} disabled={isActive || completedMoments.includes(currentMoment)}>
-                  Démarrer
-                </button>
-                <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1}>
-                  Suivant
-                </button>
-              </div>
-              <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur pour {pseudo}.</p>
-            </>
-          )}
+          <p className="moment-counter">Moment {currentMoment + 1}/7 {completedMoments.includes(currentMoment) ? '✅ Terminé' : ''}</p>
+          <h2>{moments[currentMoment].title}</h2>
+          <p>{moments[currentMoment].text}</p>
+          <p className="timer">Temps restant : {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
+          <div className="buttons">
+            <button onClick={startTimer} disabled={isActive || completedMoments.includes(currentMoment)}>
+              Démarrer
+            </button>
+            <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1}>
+              Suivant
+            </button>
+          </div>
+          <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur pour cet appareil.</p>
         </>
       )}
     </div>
