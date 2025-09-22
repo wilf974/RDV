@@ -133,6 +133,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Résoudre l'erreur npm ci lors du build Docker.
 - **Section Concernée** : Déploiement et Dépannage.
 
+### 2024-09-22
+- **Action** : Ajout système de pseudo : input pour entrer pseudo, association des moments via API, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (pseudo ajouté), GitHub (poussé).
+- **Pourquoi** : Permettre à plusieurs utilisateurs de sauvegarder leur progression individuellement.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

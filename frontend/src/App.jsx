@@ -17,6 +17,7 @@ function App() {
     return saved || '';
   });
   const [userId, setUserId] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   const moments = [
     { title: "Moment 1", text: "Psaume 23:1 - L'Éternel est mon berger, je ne manquerai de rien." },
@@ -32,10 +33,20 @@ function App() {
     if (pseudo) {
       setUserId(pseudo);
       localStorage.setItem('pseudo', pseudo);
+      setIsLoading(true);
       // Charger les moments terminés depuis l'API
       fetch(`http://localhost:12001/api/progress/${pseudo}`)
         .then(res => res.json())
-        .then(data => setCompletedMoments(data));
+        .then(data => {
+          setCompletedMoments(data);
+          setIsLoading(false);
+        })
+        .catch(err => {
+          console.error('Erreur chargement :', err);
+          setIsLoading(false);
+        });
+    } else {
+      setIsLoading(false);
     }
   }, [pseudo]);
 
@@ -99,19 +110,25 @@ function App() {
       </div>
       {pseudo && (
         <>
-          <p className="moment-counter">Moment {currentMoment + 1}/7 {completedMoments.includes(currentMoment) ? '✅ Terminé' : ''}</p>
-          <h2>{moments[currentMoment].title}</h2>
-          <p>{moments[currentMoment].text}</p>
-          <p className="timer">Temps restant : {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
-          <div className="buttons">
-            <button onClick={startTimer} disabled={isActive || completedMoments.includes(currentMoment)}>
-              Démarrer
-            </button>
-            <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1}>
-              Suivant
-            </button>
-          </div>
-          <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur pour {pseudo}.</p>
+          {isLoading ? (
+            <p>Chargement des données...</p>
+          ) : (
+            <>
+              <p className="moment-counter">Moment {currentMoment + 1}/7 {completedMoments.includes(currentMoment) ? '✅ Terminé' : ''}</p>
+              <h2>{moments[currentMoment].title}</h2>
+              <p>{moments[currentMoment].text}</p>
+              <p className="timer">Temps restant : {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
+              <div className="buttons">
+                <button onClick={startTimer} disabled={isActive || completedMoments.includes(currentMoment)}>
+                  Démarrer
+                </button>
+                <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1}>
+                  Suivant
+                </button>
+              </div>
+              <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur pour {pseudo}.</p>
+            </>
+          )}
         </>
       )}
     </div>
