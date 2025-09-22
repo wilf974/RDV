@@ -199,6 +199,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Résoudre le problème de validation du jour 1.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Correction URL API : utilisation srv819544.hstgr.cloud:12001 pour appels frontend, push vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx (URL corrigée), GitHub (poussé).
+- **Pourquoi** : Résoudre les erreurs de connexion refusée.
+- **Section Concernée** : Développement Frontend et Versioning.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

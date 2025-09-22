@@ -19,6 +19,22 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
 });
 
+// Initialiser la base de données
+async function initDB() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS progress (
+        user_id TEXT PRIMARY KEY,
+        completed_moments JSONB DEFAULT '[]',
+        completed_days JSONB DEFAULT '[]'
+      );
+    `);
+    console.log('Table progress créée ou déjà existante.');
+  } catch (err) {
+    console.error('Erreur lors de l\'initialisation DB :', err);
+  }
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -56,9 +72,11 @@ app.get('/api/progress/:userId', async (req, res) => {
   }
 });
 
-// Démarrer le serveur
-app.listen(PORT, () => {
-  console.log(`Serveur backend démarré sur le port ${PORT}`);
+// Initialiser DB et démarrer le serveur
+initDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Serveur backend démarré sur le port ${PORT}`);
+  });
 });
 
 module.exports = app;
