@@ -121,6 +121,18 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Faciliter l'usage et sauvegarder le progrès.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2024-09-22
+- **Action** : Ajout persistance serveur : API backend pour sauvegarder/récupérer moments terminés via PostgreSQL, push vers GitHub.
+- **Fichiers Impactés** : backend/src/server.js (API ajoutée), backend/package.json (cors ajouté), frontend/src/App.jsx (API intégrée), GitHub (poussé).
+- **Pourquoi** : Rendre les données persistantes sur le serveur pour tous les utilisateurs.
+- **Section Concernée** : Développement Backend et Frontend, Versioning.
+
+### 2024-09-22
+- **Action** : Correction de la synchronisation package-lock.json pour l'ajout de cors, conseils pour rebuild.
+- **Fichiers Impactés** : Aucun, commandes fournies pour VPS.
+- **Pourquoi** : Résoudre l'erreur npm ci lors du build Docker.
+- **Section Concernée** : Déploiement et Dépannage.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

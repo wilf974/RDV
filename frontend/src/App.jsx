@@ -5,7 +5,10 @@ import React, { useState, useEffect } from 'react';
  * Gère les 7 moments quotidiens avec persistance serveur et timer.
  */
 function App() {
-  const [currentMoment, setCurrentMoment] = useState(0);
+  const [currentMoment, setCurrentMoment] = useState(() => {
+    const saved = localStorage.getItem('currentMoment');
+    return saved ? parseInt(saved) : 0;
+  });
   const [timeLeft, setTimeLeft] = useState(60); // 1 minute en secondes
   const [isActive, setIsActive] = useState(false);
   const [completedMoments, setCompletedMoments] = useState([]);
@@ -60,7 +63,9 @@ function App() {
 
   const nextMoment = () => {
     if (currentMoment < moments.length - 1) {
-      setCurrentMoment(currentMoment + 1);
+      const newMoment = currentMoment + 1;
+      setCurrentMoment(newMoment);
+      localStorage.setItem('currentMoment', newMoment);
       setTimeLeft(60);
       setIsActive(false);
     }
