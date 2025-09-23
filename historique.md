@@ -217,6 +217,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Permettre aux utilisateurs de continuer les moments le lendemain sans action manuelle.
 - **Section Concernée** : Développement Frontend.
 
+### 2025-09-23
+- **Action** : Commit et push des modifications vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx, historique.md, TODO.md, etc.
+- **Pourquoi** : Sauvegarder les corrections sur le repo pour déploiement.
+- **Section Concernée** : Gestion de Version.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*
