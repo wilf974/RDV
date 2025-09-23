@@ -241,6 +241,18 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Utiliser uniquement les cookies de l'appareil pour la persistance.
 - **Section Concernée** : Développement Frontend.
 
+### 2025-09-23
+- **Action** : Push des modifications vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx, historique.md.
+- **Pourquoi** : Sauvegarder les changements de stockage local sur le repo.
+- **Section Concernée** : Gestion de Version.
+
+### 2025-09-23
+- **Action** : Empêcher le relancement des moments une fois les 7 terminés le même jour.
+- **Fichiers Impactés** : frontend/src/App.jsx (désactivation boutons).
+- **Pourquoi** : Interdire la relance le jour même, permettre le jour suivant via mise à jour automatique.
+- **Section Concernée** : Développement Frontend.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

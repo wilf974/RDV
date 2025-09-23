@@ -45,17 +45,9 @@ function App() {
       localStorage.setItem('currentMoment', 0);
       setCompletedMoments([]);
       localStorage.setItem('completedMoments', JSON.stringify([]));
-      // Sauvegarder sur l'API pour le nouveau jour
-      if (userId) {
-        fetch('http://srv819544.hstgr.cloud:12001/api/progress', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, completedMoments: [], completedDays })
-        });
-      }
       console.log('Jour mis à jour automatiquement :', today);
     }
-  }, [currentDay, userId]); // Dépendances : currentDay et userId
+  }, [currentDay]); // Pas besoin de userId
 
   const moments = [
     {
@@ -186,10 +178,10 @@ function App() {
           <p>{moments[currentMoment].text}</p>
           <p className="timer">Temps restant : {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
           <div className="buttons">
-            <button onClick={startTimer} disabled={isActive || completedMoments.includes(currentMoment)}>
+            <button onClick={startTimer} disabled={isActive || completedMoments.includes(currentMoment) || completedMoments.length === moments.length}>
               Démarrer
             </button>
-            <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1}>
+            <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1 || completedMoments.length === moments.length}>
               Suivant
             </button>
           </div>
