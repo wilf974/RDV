@@ -174,15 +174,17 @@ function App() {
     }
   };
 
-  // Générer les jours du challenge (14 jours : aujourd'hui au +13 jours pour tests)
-  const startDate = new Date();
+  // Générer les jours du challenge (14 jours : jour 1 = 22/09/2025)
+  const startDate = new Date('2025-09-22'); // Jour 1 fixe
+  const today = new Date();
   const days = [];
   for (let i = 0; i < 14; i++) {
     const day = new Date(startDate);
     day.setDate(startDate.getDate() + i);
     const dayStr = day.toISOString().split('T')[0];
     const isCompleted = completedDays.includes(dayStr);
-    days.push({ date: dayStr, isCompleted });
+    const isCurrent = dayStr === currentDay; // Jour actuel basé sur currentDay
+    days.push({ date: dayStr, isCompleted, isCurrent, dayNumber: i + 1 });
   }
 
   return (
@@ -207,14 +209,14 @@ function App() {
             </button>
           </div>
           <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur pour cet appareil.</p>
-          <h3>Calendrier des 14 Jours (22/09 - 05/10)</h3>
+          <h3>Calendrier des 14 Jours (22/09/2025 - 05/10/2025)</h3>
           <div className="calendar">
             {days.map((day, index) => (
               <div
                 key={day.date}
-                className={`day ${day.isCompleted ? 'completed' : ''}`}
+                className={`day ${day.isCompleted ? 'completed' : ''} ${day.isCurrent ? 'current' : ''}`}
               >
-                <span className="day-number">Jour {index + 1}</span>
+                <span className="day-number">Jour {day.dayNumber}</span>
                 <span className="day-date">{day.date}</span>
                 {day.isCompleted && <span className="check">✓</span>}
               </div>

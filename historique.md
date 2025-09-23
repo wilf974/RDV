@@ -223,6 +223,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Sauvegarder les corrections sur le repo pour déploiement.
 - **Section Concernée** : Gestion de Version.
 
+### 2025-09-23
+- **Action** : Ajout de surbrillance pour le jour actuel et correction des dates du calendrier.
+- **Fichiers Impactés** : frontend/src/App.jsx (logique calendrier), frontend/src/index.css (styles).
+- **Pourquoi** : Améliorer l'UX avec jour actuel en bleu et jours terminés en vert.
+- **Section Concernée** : Développement Frontend.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

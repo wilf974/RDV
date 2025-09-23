@@ -123,6 +123,12 @@ button:disabled {
   color: white;
 }
 
+.day.current {
+  background-color: #2196f3;
+  color: white;
+  border: 2px solid #1976d2;
+}
+
 .day-number {
   font-weight: bold;
   font-size: 1rem;
