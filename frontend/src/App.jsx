@@ -89,20 +89,13 @@ function App() {
   ];
 
   useEffect(() => {
-    setIsLoading(true);
-    // Charger les moments terminés depuis l'API
-    fetch(`http://srv819544.hstgr.cloud:12001/api/progress/${userId}`)
-      .then(res => res.json())
-      .then(data => {
-        setCompletedMoments(data.completedMoments || []);
-        setCompletedDays(data.completedDays || []);
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.error('Erreur chargement :', err);
-        setIsLoading(false);
-      });
-  }, [userId]);
+    // Charger les moments terminés depuis localStorage uniquement
+    const savedCompletedMoments = localStorage.getItem('completedMoments');
+    const savedCompletedDays = localStorage.getItem('completedDays');
+    setCompletedMoments(savedCompletedMoments ? JSON.parse(savedCompletedMoments) : []);
+    setCompletedDays(savedCompletedDays ? JSON.parse(savedCompletedDays) : []);
+    setIsLoading(false);
+  }, []); // Pas de dépendance sur userId pour éviter rechargement
 
   useEffect(() => {
     document.title = 'Jeûne et Prière 2026';
@@ -116,14 +109,6 @@ function App() {
             const newCompleted = [...completedMoments, currentMoment];
             setCompletedMoments(newCompleted);
             localStorage.setItem('completedMoments', JSON.stringify(newCompleted));
-            // Sauvegarder sur l'API
-            if (userId) {
-              fetch('http://srv819544.hstgr.cloud:12001/api/progress', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, completedMoments: newCompleted, completedDays })
-              });
-            }
             // Validation automatique du jour
             if (newCompleted.length === moments.length) {
               markMomentCompleted();
@@ -136,7 +121,7 @@ function App() {
       setIsActive(false);
     }
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, currentMoment, completedMoments, userId]);
+  }, [isActive, timeLeft, currentMoment, completedMoments]);
 
   const startTimer = () => {
     setTimeLeft(60);
@@ -208,7 +193,7 @@ function App() {
               Suivant
             </button>
           </div>
-          <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé sur le serveur pour cet appareil.</p>
+          <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé localement sur cet appareil.</p>
           <h3>Calendrier des 14 Jours (22/09/2025 - 05/10/2025)</h3>
           <div className="calendar">
             {days.map((day, index) => (

@@ -229,6 +229,18 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Améliorer l'UX avec jour actuel en bleu et jours terminés en vert.
 - **Section Concernée** : Développement Frontend.
 
+### 2025-09-23
+- **Action** : Push des modifications vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx, frontend/src/index.css, historique.md.
+- **Pourquoi** : Sauvegarder les améliorations du calendrier sur le repo.
+- **Section Concernée** : Gestion de Version.
+
+### 2025-09-23
+- **Action** : Suppression des appels serveur et stockage uniquement en localStorage.
+- **Fichiers Impactés** : frontend/src/App.jsx (suppression API, footer mis à jour).
+- **Pourquoi** : Utiliser uniquement les cookies de l'appareil pour la persistance.
+- **Section Concernée** : Développement Frontend.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*
