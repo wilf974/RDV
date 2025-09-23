@@ -205,6 +205,18 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Résoudre les erreurs de connexion refusée.
 - **Section Concernée** : Développement Frontend et Versioning.
 
+### 2025-09-23
+- **Action** : Clonage du dépôt Git depuis GitHub pour récupérer les fichiers du projet.
+- **Fichiers Impactés** : Tous les fichiers du dépôt clonés dans RDV/.
+- **Pourquoi** : Initialiser l'environnement de développement local.
+- **Section Concernée** : Gestion de Version.
+
+### 2025-09-23
+- **Action** : Correction de la gestion des jours pour mise à jour automatique basée sur la date système.
+- **Fichiers Impactés** : frontend/src/App.jsx (ajout useEffect pour vérification quotidienne).
+- **Pourquoi** : Permettre aux utilisateurs de continuer les moments le lendemain sans action manuelle.
+- **Section Concernée** : Développement Frontend.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

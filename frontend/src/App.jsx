@@ -34,6 +34,29 @@ function App() {
     return saved || today;
   });
 
+  // Vérifier et mettre à jour le jour actuel basé sur la date système
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    if (currentDay !== today) {
+      setCurrentDay(today);
+      localStorage.setItem('currentDay', today);
+      // Réinitialiser les moments pour le nouveau jour
+      setCurrentMoment(0);
+      localStorage.setItem('currentMoment', 0);
+      setCompletedMoments([]);
+      localStorage.setItem('completedMoments', JSON.stringify([]));
+      // Sauvegarder sur l'API pour le nouveau jour
+      if (userId) {
+        fetch('http://srv819544.hstgr.cloud:12001/api/progress', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, completedMoments: [], completedDays })
+        });
+      }
+      console.log('Jour mis à jour automatiquement :', today);
+    }
+  }, [currentDay, userId]); // Dépendances : currentDay et userId
+
   const moments = [
     {
       title: "Moment 1 - Célébration Matinale",
