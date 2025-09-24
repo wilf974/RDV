@@ -320,7 +320,7 @@ function App() {
             <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1}>
               Suivant
             </button>
-            {completedMoments.length > 0 && (
+            {completedMoments.length === moments.length && (
               <button
                 onClick={() => {
                   if (confirm('Êtes-vous sûr de vouloir recommencer la journée ? Tous les moments terminés seront remis à zéro.')) {
@@ -332,7 +332,7 @@ function App() {
                     setIsActive(false);
                   }
                 }}
-                style={{ backgroundColor: '#f39c12', marginTop: '10px' }}
+                className="reset-button"
               >
                 🔄 Recommencer le jour
               </button>

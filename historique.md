@@ -277,6 +277,24 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Sauvegarder les corrections du système de persistance multi-couches.
 - **Section Concernée** : Gestion de Version.
 
+### 2025-09-24
+- **Action** : Correction logique boutons et changement de jour automatique.
+- **Fichiers Impactés** : frontend/src/App.jsx (logique boutons, réinitialisation jour).
+- **Pourquoi** : Résoudre le problème de boutons grisés permanent après validation d'un jour.
+- **Section Concernée** : Développement Frontend.
+
+### 2025-09-24
+- **Action** : Ajout bouton réinitialisation manuelle et amélioration transition jours.
+- **Fichiers Impactés** : frontend/src/App.jsx (bouton reset, logique chargement).
+- **Pourquoi** : Permettre aux utilisateurs de recommencer leur journée si nécessaire.
+- **Section Concernée** : Développement Frontend.
+
+### 2025-09-24
+- **Action** : Commit et push vers GitHub des corrections de logique boutons.
+- **Fichiers Impactés** : frontend/src/App.jsx, historique.md, TODO.md.
+- **Pourquoi** : Sauvegarder les corrections de la logique de changement de jour.
+- **Section Concernée** : Gestion de Version.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

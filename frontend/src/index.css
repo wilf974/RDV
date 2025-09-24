@@ -55,6 +55,7 @@ p {
 
 .buttons {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
   margin: 1rem 0;
@@ -83,6 +84,29 @@ button:disabled {
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
+}
+
+.reset-button {
+  background: linear-gradient(45deg, #f39c12, #e67e22);
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+  min-width: 180px;
+}
+
+.reset-button:hover {
+  background: linear-gradient(45deg, #e67e22, #f39c12);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+}
+
+.reset-button:active {
+  transform: translateY(0);
 }
 
 .moment-counter {
@@ -145,6 +169,19 @@ button:disabled {
 }
 
 @media (max-width: 768px) {
+  .buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .reset-button {
+    width: 100%;
+    max-width: 250px;
+    margin-top: 10px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
   .calendar {
     grid-template-columns: repeat(3, 1fr);
     gap: 5px;
@@ -165,6 +202,12 @@ button:disabled {
 }
 
 @media (max-width: 480px) {
+  .reset-button {
+    max-width: 200px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+
   .calendar {
     grid-template-columns: repeat(2, 1fr);
   }
