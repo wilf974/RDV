@@ -295,6 +295,18 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Sauvegarder les corrections de la logique de changement de jour.
 - **Section Concernée** : Gestion de Version.
 
+### 2025-09-24
+- **Action** : Correction logique et responsive du bouton "Recommencer le jour".
+- **Fichiers Impactés** : frontend/src/App.jsx (logique condition), frontend/src/index.css (styles responsive).
+- **Pourquoi** : Le bouton n'apparaît que quand nécessaire et s'adapte à tous les écrans.
+- **Section Concernée** : Développement Frontend et Responsive Design.
+
+### 2025-09-24
+- **Action** : Commit et push vers GitHub des corrections bouton recommencer.
+- **Fichiers Impactés** : frontend/src/App.jsx, frontend/src/index.css, historique.md, TODO.md.
+- **Pourquoi** : Sauvegarder les améliorations de l'interface utilisateur.
+- **Section Concernée** : Gestion de Version.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

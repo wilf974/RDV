@@ -18,4 +18,7 @@ Liste des tâches en cours et futures pour le développement du projet.
 - [x] Clonage du dépôt Git.
 - [x] Lecture et mise à jour de l'historique.md.
 - [x] Correction problème Telegram: système de persistance multi-couches.
+- [x] Correction logique boutons et changement de jour automatique.
+- [x] Ajout bouton réinitialisation manuelle du jour.
+- [x] Correction logique et responsive du bouton "Recommencer le jour".
 - [x] Déploiement des corrections vers GitHub.

@@ -301,9 +301,14 @@ function App() {
       <p>21 Sept. au 12 Oct. 2025 - Célébrer : Faire, Chanter, Jeter, Briller, Fêter, Danser, Pèlerinage</p>
       <p style={{ fontSize: '0.9rem', color: '#7f8c8d' }}>ID Appareil : {userId}</p>
       {isTelegramWebView() && (
-        <p style={{ fontSize: '0.8rem', color: '#e67e22', fontWeight: 'bold' }}>
-          🔗 Environnement Telegram détecté - Sauvegarde multi-couches activée
-        </p>
+        <div style={{ backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '5px', padding: '10px', margin: '10px 0' }}>
+          <p style={{ fontSize: '0.8rem', color: '#856404', fontWeight: 'bold', margin: '0' }}>
+            🔗 Environnement Telegram détecté - Sauvegarde multi-couches activée
+          </p>
+          <p style={{ fontSize: '0.7rem', color: '#856404', margin: '5px 0 0 0' }}>
+            Si les boutons sont grisés, le bouton "🔄 Recommencer le jour" devrait apparaître
+          </p>
+        </div>
       )}
       {isLoading ? (
         <p>Chargement des données...</p>
@@ -320,25 +325,106 @@ function App() {
             <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1}>
               Suivant
             </button>
-            {completedMoments.length === moments.length && (
-              <button
-                onClick={() => {
-                  if (confirm('Êtes-vous sûr de vouloir recommencer la journée ? Tous les moments terminés seront remis à zéro.')) {
-                    setCompletedMoments([]);
-                    setStoredValue('completedMoments', JSON.stringify([]));
-                    setCurrentMoment(0);
-                    setStoredValue('currentMoment', '0');
-                    setTimeLeft(60);
-                    setIsActive(false);
-                  }
-                }}
-                className="reset-button"
-              >
-                🔄 Recommencer le jour
-              </button>
-            )}
+            {(() => {
+              // Logique de détection pour le bouton de réinitialisation
+              const isAllMomentsCompleted = completedMoments.length === moments.length;
+              const isButtonsDisabled = isActive || completedMoments.includes(currentMoment);
+
+              console.log('Debug bouton reset:', {
+                completedMomentsLength: completedMoments.length,
+                momentsLength: moments.length,
+                isAllCompleted: isAllMomentsCompleted,
+                isButtonsDisabled: isButtonsDisabled,
+                currentMoment: currentMoment,
+                isActive: isActive,
+                telegram: isTelegramWebView(),
+                currentDay: currentDay
+              });
+
+              // Afficher le bouton si tous les moments sont terminés
+              // OU si les boutons principaux sont grisés (sécurité pour Telegram)
+              if (isAllMomentsCompleted || (isButtonsDisabled && currentMoment === 0 && completedMoments.length > 0)) {
+                return (
+                  <button
+                    onClick={() => {
+                      if (confirm('Êtes-vous sûr de vouloir recommencer la journée ? Tous les moments terminés seront remis à zéro.')) {
+                        setCompletedMoments([]);
+                        setStoredValue('completedMoments', JSON.stringify([]));
+                        setCurrentMoment(0);
+                        setStoredValue('currentMoment', '0');
+                        setTimeLeft(60);
+                        setIsActive(false);
+                      }
+                    }}
+                    className="reset-button"
+                  >
+                    🔄 Recommencer le jour
+                  </button>
+                );
+              }
+              return null;
+            })()}
           </div>
           <p className="footer">Moments terminés aujourd'hui : {completedMoments.length}/7. Progress sauvegardé localement sur cet appareil.</p>
+
+          {/* Section de diagnostic pour Telegram */}
+          {isTelegramWebView() && completedMoments.length > 0 && completedMoments.length < moments.length && (
+            <div style={{ backgroundColor: '#d4edda', border: '1px solid #c3e6cb', borderRadius: '5px', padding: '10px', margin: '10px 0' }}>
+              <p style={{ fontSize: '0.8rem', color: '#155724', fontWeight: 'bold', margin: '0' }}>
+                🔍 Debug: Moments en cours détectés ({completedMoments.length}/{moments.length})
+              </p>
+              <p style={{ fontSize: '0.7rem', color: '#155724', margin: '5px 0 0 0' }}>
+                Continuez vos moments ou terminez-les pour voir le bouton de réinitialisation
+              </p>
+            </div>
+          )}
+
+          {/* Section d'aide pour Telegram quand les boutons sont grisés */}
+          {isTelegramWebView() && (completedMoments.length === 0 || completedMoments.length === moments.length) && (
+            <div style={{ backgroundColor: '#f8d7da', border: '1px solid #f5c6cb', borderRadius: '5px', padding: '10px', margin: '10px 0' }}>
+              <p style={{ fontSize: '0.8rem', color: '#721c24', fontWeight: 'bold', margin: '0' }}>
+                🔍 Debug Telegram: État actuel
+              </p>
+              <p style={{ fontSize: '0.7rem', color: '#721c24', margin: '5px 0 0 0' }}>
+                Moments: {completedMoments.length}/{moments.length} | Boutons grisés: {completedMoments.length === moments.length ? 'Oui' : 'Non'}
+              </p>
+              {completedMoments.length === moments.length && (
+                <p style={{ fontSize: '0.7rem', color: '#721c24', margin: '5px 0 0 0', fontWeight: 'bold' }}>
+                  ⚠️ Le bouton de réinitialisation devrait apparaître ci-dessus !
+                </p>
+              )}
+              {completedMoments.length === moments.length && (
+                <button
+                  onClick={() => {
+                    console.log('Réinitialisation forcée pour Telegram');
+                    // Forcer la réinitialisation en simulant un nouveau jour
+                    const today = new Date().toISOString().split('T')[0];
+                    setCurrentDay(today);
+                    setStoredValue('currentDay', today);
+                    setCurrentMoment(0);
+                    setStoredValue('currentMoment', '0');
+                    setCompletedMoments([]);
+                    setStoredValue('completedMoments', JSON.stringify([]));
+                    setTimeLeft(60);
+                    setIsActive(false);
+                    alert('Réinitialisation forcée effectuée ! Les boutons devraient maintenant être accessibles.');
+                  }}
+                  style={{
+                    backgroundColor: '#dc3545',
+                    color: 'white',
+                    padding: '8px 16px',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '0.7rem',
+                    marginTop: '10px'
+                  }}
+                >
+                  🚨 Réinitialisation d'urgence
+                </button>
+              )}
+            </div>
+          )}
           <h3>Calendrier des 14 Jours (22/09/2025 - 05/10/2025)</h3>
           <div className="calendar">
             {days.map((day, index) => (
