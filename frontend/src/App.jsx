@@ -100,16 +100,24 @@ function App() {
       console.log('Mise à jour jour détectée:', currentDay, '->', today);
       console.log('Environnement Telegram:', isTelegramWebView());
 
+      // Vérifier si le jour actuel était déjà terminé
+      const wasDayCompleted = completedDays.includes(currentDay);
+
       setCurrentDay(today);
       setStoredValue('currentDay', today);
-      // Réinitialiser les moments pour le nouveau jour
-      setCurrentMoment(0);
-      setStoredValue('currentMoment', '0');
-      setCompletedMoments([]);
-      setStoredValue('completedMoments', JSON.stringify([]));
-      console.log('Jour mis à jour automatiquement :', today);
+
+      // Réinitialiser les moments pour le nouveau jour seulement si le jour précédent était terminé
+      if (wasDayCompleted) {
+        setCurrentMoment(0);
+        setStoredValue('currentMoment', '0');
+        setCompletedMoments([]);
+        setStoredValue('completedMoments', JSON.stringify([]));
+        console.log('Jour mis à jour automatiquement - Moments réinitialisés :', today);
+      } else {
+        console.log('Jour mis à jour mais moments conservés pour permettre la reprise :', today);
+      }
     }
-  }, [currentDay]); // Pas besoin de userId
+  }, [currentDay, completedDays]); // Ajout completedDays comme dépendance
 
   const moments = [
     {
@@ -146,11 +154,36 @@ function App() {
     // Charger les moments terminés depuis le système de persistance multi-couches
     const savedCompletedMoments = getStoredValue('completedMoments');
     const savedCompletedDays = getStoredValue('completedDays');
-    setCompletedMoments(savedCompletedMoments ? JSON.parse(savedCompletedMoments) : []);
-    setCompletedDays(savedCompletedDays ? JSON.parse(savedCompletedDays) : []);
+    const savedCurrentDay = getStoredValue('currentDay');
+
+    const loadedCompletedMoments = savedCompletedMoments ? JSON.parse(savedCompletedMoments) : [];
+    const loadedCompletedDays = savedCompletedDays ? JSON.parse(savedCompletedDays) : [];
+
+    // Vérifier si le jour sauvegardé correspond au jour actuel
+    const today = new Date().toISOString().split('T')[0];
+    if (savedCurrentDay && savedCurrentDay !== today) {
+      // Jour différent - vérifier si le jour sauvegardé était terminé
+      if (loadedCompletedDays.includes(savedCurrentDay)) {
+        // Le jour précédent était terminé - réinitialiser pour aujourd'hui
+        console.log('Jour précédent terminé - réinitialisation pour aujourd\'hui');
+        setCompletedMoments([]);
+        setStoredValue('completedMoments', JSON.stringify([]));
+        setCurrentMoment(0);
+        setStoredValue('currentMoment', '0');
+      } else {
+        // Jour précédent non terminé - conserver les moments en cours
+        console.log('Reprise des moments en cours du jour précédent');
+      }
+    }
+
+    setCompletedMoments(loadedCompletedMoments);
+    setCompletedDays(loadedCompletedDays);
+
     console.log('Données chargées:', {
-      completedMoments: savedCompletedMoments ? JSON.parse(savedCompletedMoments) : [],
-      completedDays: savedCompletedDays ? JSON.parse(savedCompletedDays) : [],
+      completedMoments: loadedCompletedMoments,
+      completedDays: loadedCompletedDays,
+      currentDay: savedCurrentDay,
+      today: today,
       telegram: isTelegramWebView()
     });
     setIsLoading(false);
@@ -215,20 +248,37 @@ function App() {
     const newCompleted = [...completedMoments, currentMoment];
     setCompletedMoments(newCompleted);
     setStoredValue('completedMoments', JSON.stringify(newCompleted));
-    // Si tous les moments du jour sont terminés, marquer le jour comme terminé et passer au suivant
+
+    // Si tous les moments du jour actuel sont terminés, marquer le jour comme terminé
     if (newCompleted.length === moments.length) {
-      console.log('Tous les moments terminés, validation du jour :', currentDay);
+      console.log('Tous les moments du jour terminés, validation du jour :', currentDay);
       const newCompletedDays = [...completedDays, currentDay];
       setCompletedDays(newCompletedDays);
       setStoredValue('completedDays', JSON.stringify(newCompletedDays));
+
+      // Préparer le jour suivant
       const nextDay = new Date(currentDay);
       nextDay.setDate(nextDay.getDate() + 1);
       const nextDayStr = nextDay.toISOString().split('T')[0];
-      setCurrentDay(nextDayStr);
-      setStoredValue('currentDay', nextDayStr);
-      setCurrentMoment(0);
-      setStoredValue('currentMoment', '0');
-      alert('Félicitations ! Tous les moments terminés. Jour suivant débloqué.');
+
+      // Vérifier si c'est un jour de challenge (dans les 14 jours)
+      const startDate = new Date('2025-09-22');
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 13); // 14 jours total
+
+      if (nextDay <= endDate) {
+        // Jour suivant disponible dans le challenge
+        setCurrentDay(nextDayStr);
+        setStoredValue('currentDay', nextDayStr);
+        setCurrentMoment(0);
+        setStoredValue('currentMoment', '0');
+        setCompletedMoments([]); // Réinitialiser pour le nouveau jour
+        setStoredValue('completedMoments', JSON.stringify([]));
+        alert('Félicitations ! Tous les moments terminés. Jour suivant débloqué.');
+      } else {
+        // Challenge terminé
+        alert('🎉 Félicitations ! Vous avez terminé tous les 14 jours du challenge !');
+      }
     }
   };
 
@@ -264,14 +314,31 @@ function App() {
           <p>{moments[currentMoment].text}</p>
           <p className="timer">Temps restant : {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</p>
           <div className="buttons">
-            <button onClick={startTimer} disabled={isActive || completedMoments.includes(currentMoment) || completedMoments.length === moments.length}>
+            <button onClick={startTimer} disabled={isActive || completedMoments.includes(currentMoment)}>
               Démarrer
             </button>
-            <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1 || completedMoments.length === moments.length}>
+            <button onClick={nextMoment} disabled={currentMoment >= moments.length - 1}>
               Suivant
             </button>
+            {completedMoments.length > 0 && (
+              <button
+                onClick={() => {
+                  if (confirm('Êtes-vous sûr de vouloir recommencer la journée ? Tous les moments terminés seront remis à zéro.')) {
+                    setCompletedMoments([]);
+                    setStoredValue('completedMoments', JSON.stringify([]));
+                    setCurrentMoment(0);
+                    setStoredValue('currentMoment', '0');
+                    setTimeLeft(60);
+                    setIsActive(false);
+                  }
+                }}
+                style={{ backgroundColor: '#f39c12', marginTop: '10px' }}
+              >
+                🔄 Recommencer le jour
+              </button>
+            )}
           </div>
-          <p className="footer">Moments terminés : {completedMoments.length}/7. Progress sauvegardé localement sur cet appareil.</p>
+          <p className="footer">Moments terminés aujourd'hui : {completedMoments.length}/7. Progress sauvegardé localement sur cet appareil.</p>
           <h3>Calendrier des 14 Jours (22/09/2025 - 05/10/2025)</h3>
           <div className="calendar">
             {days.map((day, index) => (

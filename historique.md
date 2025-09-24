@@ -271,6 +271,12 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Améliorer la fiabilité de la persistance sur différents environnements mobiles.
 - **Section Concernée** : Développement Frontend et Persistance.
 
+### 2025-09-24
+- **Action** : Commit et push vers GitHub des corrections Telegram.
+- **Fichiers Impactés** : frontend/src/App.jsx, historique.md, TODO.md.
+- **Pourquoi** : Sauvegarder les corrections du système de persistance multi-couches.
+- **Section Concernée** : Gestion de Version.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

@@ -17,3 +17,5 @@ Liste des tâches en cours et futures pour le développement du projet.
 ## Tâches Terminées
 - [x] Clonage du dépôt Git.
 - [x] Lecture et mise à jour de l'historique.md.
+- [x] Correction problème Telegram: système de persistance multi-couches.
+- [x] Déploiement des corrections vers GitHub.
