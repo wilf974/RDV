@@ -1,36 +1,95 @@
 import React, { useState, useEffect } from 'react';
 
 /**
+ * Fonctions utilitaires pour la persistance multi-couches
+ * Gère localStorage, sessionStorage et cookies comme fallback
+ */
+const isTelegramWebView = () => {
+  return window.TelegramWebviewProxy || window.TelegramWebApp;
+};
+
+const setStoredValue = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+    // Sauvegarde également en sessionStorage pour Telegram
+    sessionStorage.setItem(key, value);
+    // Sauvegarde en cookie comme fallback
+    document.cookie = `${key}=${value}; path=/; max-age=86400`; // 24h
+  } catch (error) {
+    console.warn('Erreur sauvegarde localStorage:', error);
+    try {
+      sessionStorage.setItem(key, value);
+      document.cookie = `${key}=${value}; path=/; max-age=86400`;
+    } catch (sessionError) {
+      console.warn('Erreur sauvegarde sessionStorage:', sessionError);
+    }
+  }
+};
+
+const getStoredValue = (key) => {
+  try {
+    // Essaie d'abord localStorage
+    const localValue = localStorage.getItem(key);
+    if (localValue) return localValue;
+
+    // Fallback vers sessionStorage (utile pour Telegram)
+    const sessionValue = sessionStorage.getItem(key);
+    if (sessionValue) return sessionValue;
+
+    // Fallback vers cookies
+    const cookieValue = getCookieValue(key);
+    return cookieValue;
+  } catch (error) {
+    console.warn('Erreur lecture localStorage:', error);
+    try {
+      const sessionValue = sessionStorage.getItem(key);
+      if (sessionValue) return sessionValue;
+      return getCookieValue(key);
+    } catch (sessionError) {
+      console.warn('Erreur lecture sessionStorage:', sessionError);
+      return getCookieValue(key);
+    }
+  }
+};
+
+const getCookieValue = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+};
+
+/**
  * Composant principal de l'application de Jeûne et Prière 2026.
- * Gère les 7 moments quotidiens avec persistance serveur via cookies.
+ * Gère les 7 moments quotidiens avec persistance multi-couches.
  */
 function App() {
   const [currentMoment, setCurrentMoment] = useState(() => {
-    const saved = localStorage.getItem('currentMoment');
+    const saved = getStoredValue('currentMoment');
     return saved ? parseInt(saved) : 0;
   });
   const [timeLeft, setTimeLeft] = useState(60); // 1 minute en secondes
   const [isActive, setIsActive] = useState(false);
   const [completedMoments, setCompletedMoments] = useState(() => {
-    const saved = localStorage.getItem('completedMoments');
+    const saved = getStoredValue('completedMoments');
     return saved ? JSON.parse(saved) : [];
   });
   const [completedDays, setCompletedDays] = useState(() => {
-    const saved = localStorage.getItem('completedDays');
+    const saved = getStoredValue('completedDays');
     return saved ? JSON.parse(saved) : [];
   });
   const [userId, setUserId] = useState(() => {
-    let id = localStorage.getItem('userId');
+    let id = getStoredValue('userId');
     if (!id) {
       id = 'user_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('userId', id);
+      setStoredValue('userId', id);
     }
     return id;
   });
   const [isLoading, setIsLoading] = useState(true);
   const [currentDay, setCurrentDay] = useState(() => {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const saved = localStorage.getItem('currentDay');
+    const saved = getStoredValue('currentDay');
     return saved || today;
   });
 
@@ -38,13 +97,16 @@ function App() {
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
     if (currentDay !== today) {
+      console.log('Mise à jour jour détectée:', currentDay, '->', today);
+      console.log('Environnement Telegram:', isTelegramWebView());
+
       setCurrentDay(today);
-      localStorage.setItem('currentDay', today);
+      setStoredValue('currentDay', today);
       // Réinitialiser les moments pour le nouveau jour
       setCurrentMoment(0);
-      localStorage.setItem('currentMoment', 0);
+      setStoredValue('currentMoment', '0');
       setCompletedMoments([]);
-      localStorage.setItem('completedMoments', JSON.stringify([]));
+      setStoredValue('completedMoments', JSON.stringify([]));
       console.log('Jour mis à jour automatiquement :', today);
     }
   }, [currentDay]); // Pas besoin de userId
@@ -81,13 +143,32 @@ function App() {
   ];
 
   useEffect(() => {
-    // Charger les moments terminés depuis localStorage uniquement
-    const savedCompletedMoments = localStorage.getItem('completedMoments');
-    const savedCompletedDays = localStorage.getItem('completedDays');
+    // Charger les moments terminés depuis le système de persistance multi-couches
+    const savedCompletedMoments = getStoredValue('completedMoments');
+    const savedCompletedDays = getStoredValue('completedDays');
     setCompletedMoments(savedCompletedMoments ? JSON.parse(savedCompletedMoments) : []);
     setCompletedDays(savedCompletedDays ? JSON.parse(savedCompletedDays) : []);
+    console.log('Données chargées:', {
+      completedMoments: savedCompletedMoments ? JSON.parse(savedCompletedMoments) : [],
+      completedDays: savedCompletedDays ? JSON.parse(savedCompletedDays) : [],
+      telegram: isTelegramWebView()
+    });
     setIsLoading(false);
   }, []); // Pas de dépendance sur userId pour éviter rechargement
+
+  // Sauvegarde automatique lors du déchargement (important pour Telegram)
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      console.log('Sauvegarde avant fermeture...');
+      setStoredValue('currentMoment', currentMoment.toString());
+      setStoredValue('completedMoments', JSON.stringify(completedMoments));
+      setStoredValue('completedDays', JSON.stringify(completedDays));
+      setStoredValue('currentDay', currentDay);
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [currentMoment, completedMoments, completedDays, currentDay]);
 
   useEffect(() => {
     document.title = 'Jeûne et Prière 2026';
@@ -124,7 +205,7 @@ function App() {
     if (currentMoment < moments.length - 1) {
       const newMoment = currentMoment + 1;
       setCurrentMoment(newMoment);
-      localStorage.setItem('currentMoment', newMoment);
+      setStoredValue('currentMoment', newMoment.toString());
       setTimeLeft(60);
       setIsActive(false);
     }
@@ -133,20 +214,20 @@ function App() {
   const markMomentCompleted = () => {
     const newCompleted = [...completedMoments, currentMoment];
     setCompletedMoments(newCompleted);
-    localStorage.setItem('completedMoments', JSON.stringify(newCompleted));
+    setStoredValue('completedMoments', JSON.stringify(newCompleted));
     // Si tous les moments du jour sont terminés, marquer le jour comme terminé et passer au suivant
     if (newCompleted.length === moments.length) {
       console.log('Tous les moments terminés, validation du jour :', currentDay);
       const newCompletedDays = [...completedDays, currentDay];
       setCompletedDays(newCompletedDays);
-      localStorage.setItem('completedDays', JSON.stringify(newCompletedDays));
+      setStoredValue('completedDays', JSON.stringify(newCompletedDays));
       const nextDay = new Date(currentDay);
       nextDay.setDate(nextDay.getDate() + 1);
       const nextDayStr = nextDay.toISOString().split('T')[0];
       setCurrentDay(nextDayStr);
-      localStorage.setItem('currentDay', nextDayStr);
+      setStoredValue('currentDay', nextDayStr);
       setCurrentMoment(0);
-      localStorage.setItem('currentMoment', 0);
+      setStoredValue('currentMoment', '0');
       alert('Félicitations ! Tous les moments terminés. Jour suivant débloqué.');
     }
   };
@@ -169,6 +250,11 @@ function App() {
       <h1>🙏 21 Jours de CÉLÉBRATIONS À L’ÉTERNEL</h1>
       <p>21 Sept. au 12 Oct. 2025 - Célébrer : Faire, Chanter, Jeter, Briller, Fêter, Danser, Pèlerinage</p>
       <p style={{ fontSize: '0.9rem', color: '#7f8c8d' }}>ID Appareil : {userId}</p>
+      {isTelegramWebView() && (
+        <p style={{ fontSize: '0.8rem', color: '#e67e22', fontWeight: 'bold' }}>
+          🔗 Environnement Telegram détecté - Sauvegarde multi-couches activée
+        </p>
+      )}
       {isLoading ? (
         <p>Chargement des données...</p>
       ) : (

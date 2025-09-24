@@ -253,6 +253,24 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Interdire la relance le jour même, permettre le jour suivant via mise à jour automatique.
 - **Section Concernée** : Développement Frontend.
 
+### 2025-09-23
+- **Action** : Push des modifications vers GitHub.
+- **Fichiers Impactés** : frontend/src/App.jsx, historique.md.
+- **Pourquoi** : Sauvegarder la correction de relancement sur le repo.
+- **Section Concernée** : Gestion de Version.
+
+### 2025-09-24
+- **Action** : Correction du problème de cache dans Telegram WebView avec système de persistance multi-couches.
+- **Fichiers Impactés** : frontend/src/App.jsx (système de persistance amélioré).
+- **Pourquoi** : Résoudre le problème de boutons grisés dans Telegram en raison de la perte de validation des jours.
+- **Section Concernée** : Développement Frontend et Persistance.
+
+### 2025-09-24
+- **Action** : Ajout de détection Telegram WebView et fallback vers sessionStorage/cookies.
+- **Fichiers Impactés** : frontend/src/App.jsx (fonctions utilitaires ajoutées).
+- **Pourquoi** : Améliorer la fiabilité de la persistance sur différents environnements mobiles.
+- **Section Concernée** : Développement Frontend et Persistance.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*
