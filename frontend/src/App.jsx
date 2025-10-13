@@ -92,6 +92,9 @@ function App() {
     const saved = getStoredValue('currentDay');
     return saved || today;
   });
+  const [selectedDay, setSelectedDay] = useState(null); // Pour la navigation libre
+  const [displayMonth, setDisplayMonth] = useState(new Date().getMonth());
+  const [displayYear, setDisplayYear] = useState(new Date().getFullYear());
 
   // Vérifier et mettre à jour le jour actuel basé sur la date système
   useEffect(() => {
@@ -244,6 +247,21 @@ function App() {
     }
   };
 
+  // Fonction pour changer de jour librement
+  const changeDay = (dayDate) => {
+    if (confirm(`Voulez-vous passer au ${dayDate} ? Vos progrès actuels seront sauvegardés.`)) {
+      setCurrentDay(dayDate);
+      setStoredValue('currentDay', dayDate);
+      setCurrentMoment(0);
+      setStoredValue('currentMoment', '0');
+      setCompletedMoments([]);
+      setStoredValue('completedMoments', JSON.stringify([]));
+      setTimeLeft(60);
+      setIsActive(false);
+      setSelectedDay(null);
+    }
+  };
+
   const markMomentCompleted = () => {
     const newCompleted = [...completedMoments, currentMoment];
     setCompletedMoments(newCompleted);
@@ -261,44 +279,78 @@ function App() {
       nextDay.setDate(nextDay.getDate() + 1);
       const nextDayStr = nextDay.toISOString().split('T')[0];
 
-      // Vérifier si c'est un jour de challenge (dans les 14 jours)
-      const startDate = new Date('2025-09-22');
-      const endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 13); // 14 jours total
-
-      if (nextDay <= endDate) {
-        // Jour suivant disponible dans le challenge
-        setCurrentDay(nextDayStr);
-        setStoredValue('currentDay', nextDayStr);
-        setCurrentMoment(0);
-        setStoredValue('currentMoment', '0');
-        setCompletedMoments([]); // Réinitialiser pour le nouveau jour
-        setStoredValue('completedMoments', JSON.stringify([]));
-        alert('Félicitations ! Tous les moments terminés. Jour suivant débloqué.');
-      } else {
-        // Challenge terminé
-        alert('🎉 Félicitations ! Vous avez terminé tous les 14 jours du challenge !');
-      }
+      // Tous les jours sont maintenant disponibles (21 jours)
+      setCurrentDay(nextDayStr);
+      setStoredValue('currentDay', nextDayStr);
+      setCurrentMoment(0);
+      setStoredValue('currentMoment', '0');
+      setCompletedMoments([]); // Réinitialiser pour le nouveau jour
+      setStoredValue('completedMoments', JSON.stringify([]));
+      alert('Félicitations ! Tous les moments terminés. Jour suivant débloqué.');
     }
   };
 
-  // Générer les jours du challenge (14 jours : jour 1 = 22/09/2025)
-  const startDate = new Date('2025-09-22'); // Jour 1 fixe
+  // Générer le calendrier mensuel complet
   const today = new Date();
+  
+  // Obtenir le premier jour du mois et le nombre de jours
+  const firstDayOfMonth = new Date(displayYear, displayMonth, 1);
+  const lastDayOfMonth = new Date(displayYear, displayMonth + 1, 0);
+  const daysInMonth = lastDayOfMonth.getDate();
+  const startingDayOfWeek = firstDayOfMonth.getDay(); // 0 = dimanche, 1 = lundi, etc.
+  
   const days = [];
-  for (let i = 0; i < 14; i++) {
-    const day = new Date(startDate);
-    day.setDate(startDate.getDate() + i);
-    const dayStr = day.toISOString().split('T')[0];
-    const isCompleted = completedDays.includes(dayStr);
-    const isCurrent = dayStr === currentDay; // Jour actuel basé sur currentDay
-    days.push({ date: dayStr, isCompleted, isCurrent, dayNumber: i + 1 });
+  
+  // Ajouter les jours vides du début du mois
+  for (let i = 0; i < startingDayOfWeek; i++) {
+    days.push({ date: null, isCompleted: false, isCurrent: false, dayNumber: null, isEmpty: true });
   }
+  
+  // Ajouter tous les jours du mois
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(displayYear, displayMonth, day);
+    const dayStr = date.toISOString().split('T')[0];
+    const isCompleted = completedDays.includes(dayStr);
+    const isCurrent = dayStr === currentDay;
+    days.push({ 
+      date: dayStr, 
+      isCompleted, 
+      isCurrent, 
+      dayNumber: day,
+      isEmpty: false,
+      displayDate: day
+    });
+  }
+
+  // Fonctions pour naviguer entre les mois
+  const goToPreviousMonth = () => {
+    if (displayMonth === 0) {
+      setDisplayMonth(11);
+      setDisplayYear(displayYear - 1);
+    } else {
+      setDisplayMonth(displayMonth - 1);
+    }
+  };
+
+  const goToNextMonth = () => {
+    if (displayMonth === 11) {
+      setDisplayMonth(0);
+      setDisplayYear(displayYear + 1);
+    } else {
+      setDisplayMonth(displayMonth + 1);
+    }
+  };
+
+  const goToToday = () => {
+    const today = new Date();
+    setDisplayMonth(today.getMonth());
+    setDisplayYear(today.getFullYear());
+  };
 
   return (
     <div className="app">
-      <h1>🙏 21 Jours de CÉLÉBRATIONS À L’ÉTERNEL</h1>
-      <p>21 Sept. au 12 Oct. 2025 - Célébrer : Faire, Chanter, Jeter, Briller, Fêter, Danser, Pèlerinage</p>
+      <h1>🙏 CÉLÉBRATIONS QUOTIDIENNES À L'ÉTERNEL</h1>
+      <p>Célébrer chaque jour : Faire, Chanter, Jeter, Briller, Fêter, Danser, Pèlerinage</p>
       <p style={{ fontSize: '0.9rem', color: '#7f8c8d' }}>ID Appareil : {userId}</p>
       {isTelegramWebView() && (
         <div style={{ backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '5px', padding: '10px', margin: '10px 0' }}>
@@ -366,6 +418,29 @@ function App() {
             })()}
           </div>
           <p className="footer">Moments terminés aujourd'hui : {completedMoments.length}/7. Progress sauvegardé localement sur cet appareil.</p>
+          
+          {/* Bouton pour navigation libre entre les jours */}
+          <div style={{ margin: '20px 0', textAlign: 'center' }}>
+            <button 
+              onClick={() => setSelectedDay(selectedDay ? null : true)}
+              style={{
+                backgroundColor: '#3498db',
+                color: 'white',
+                padding: '10px 20px',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontSize: '0.9rem'
+              }}
+            >
+              {selectedDay ? 'Annuler' : '📅 Changer de jour'}
+            </button>
+            {selectedDay && (
+              <p style={{ fontSize: '0.8rem', color: '#7f8c8d', margin: '10px 0' }}>
+                Cliquez sur un jour dans le calendrier ci-dessous pour y naviguer
+              </p>
+            )}
+          </div>
 
           {/* Section de diagnostic pour Telegram */}
           {isTelegramWebView() && completedMoments.length > 0 && completedMoments.length < moments.length && (
@@ -425,16 +500,40 @@ function App() {
               )}
             </div>
           )}
-          <h3>Calendrier des 14 Jours (22/09/2025 - 05/10/2025)</h3>
+          <div className="calendar-navigation">
+            <button onClick={goToPreviousMonth} className="nav-button">‹</button>
+            <h3>{new Date(displayYear, displayMonth).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</h3>
+            <button onClick={goToNextMonth} className="nav-button">›</button>
+          </div>
+          <button onClick={goToToday} className="today-button">Aujourd'hui</button>
+          <div className="calendar-header">
+            <div className="day-header">Dim</div>
+            <div className="day-header">Lun</div>
+            <div className="day-header">Mar</div>
+            <div className="day-header">Mer</div>
+            <div className="day-header">Jeu</div>
+            <div className="day-header">Ven</div>
+            <div className="day-header">Sam</div>
+          </div>
           <div className="calendar">
             {days.map((day, index) => (
               <div
-                key={day.date}
-                className={`day ${day.isCompleted ? 'completed' : ''} ${day.isCurrent ? 'current' : ''}`}
+                key={day.date || `empty-${index}`}
+                className={`day ${day.isCompleted ? 'completed' : ''} ${day.isCurrent ? 'current' : ''} ${selectedDay && !day.isEmpty ? 'selectable' : ''} ${day.isEmpty ? 'empty' : ''}`}
+                onClick={selectedDay && !day.isEmpty ? () => changeDay(day.date) : undefined}
+                style={selectedDay && !day.isEmpty ? { cursor: 'pointer' } : {}}
               >
-                <span className="day-number">Jour {day.dayNumber}</span>
-                <span className="day-date">{day.date}</span>
-                {day.isCompleted && <span className="check">✓</span>}
+                {!day.isEmpty && (
+                  <>
+                    <span className="day-number">{day.displayDate}</span>
+                    {day.isCompleted && <span className="check">✓</span>}
+                    {selectedDay && (
+                      <span style={{ fontSize: '0.6rem', color: '#3498db', marginTop: '2px', display: 'block' }}>
+                        Cliquer
+                      </span>
+                    )}
+                  </>
+                )}
               </div>
             ))}
           </div>

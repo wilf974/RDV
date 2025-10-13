@@ -21,4 +21,6 @@ Liste des tâches en cours et futures pour le développement du projet.
 - [x] Correction logique boutons et changement de jour automatique.
 - [x] Ajout bouton réinitialisation manuelle du jour.
 - [x] Correction logique et responsive du bouton "Recommencer le jour".
+- [x] Correction problème d'affichage bouton reset dans Telegram WebView.
+- [x] Ajout système de diagnostic et réinitialisation d'urgence pour Telegram.
 - [x] Déploiement des corrections vers GitHub.

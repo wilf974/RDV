@@ -307,6 +307,48 @@ Ce fichier tracke les modifications et actions effectuées sur le projet "Applic
 - **Pourquoi** : Sauvegarder les améliorations de l'interface utilisateur.
 - **Section Concernée** : Gestion de Version.
 
+### 2025-09-24
+- **Action** : Correction problème d'affichage du bouton reset dans Telegram WebView.
+- **Fichiers Impactés** : frontend/src/App.jsx (logs debug, logique fallback, indicateurs visuels).
+- **Pourquoi** : Résoudre le cas où les boutons sont grisés mais le bouton reset n'apparaît pas.
+- **Section Concernée** : Développement Frontend et Debug Telegram.
+
+### 2025-09-24
+- **Action** : Ajout système de diagnostic et réinitialisation d'urgence pour Telegram.
+- **Fichiers Impactés** : frontend/src/App.jsx (sections debug, bouton urgence).
+- **Pourquoi** : Permettre aux utilisateurs Telegram de diagnostiquer et résoudre les problèmes de boutons.
+- **Section Concernée** : Développement Frontend et Support Utilisateur.
+
+### 2025-09-24
+- **Action** : Commit et push vers GitHub des corrections Telegram bouton reset.
+- **Fichiers Impactés** : frontend/src/App.jsx, historique.md, TODO.md.
+- **Pourquoi** : Sauvegarder les corrections pour le problème Telegram.
+- **Section Concernée** : Gestion de Version.
+
+### 2025-10-13
+- **Action** : Correction des erreurs de build Docker - génération package-lock.json et modification Dockerfiles.
+- **Fichiers Impactés** : backend/package-lock.json (généré), backend/Dockerfile (modifié), frontend/package-lock.json (généré), frontend/Dockerfile (modifié).
+- **Pourquoi** : Résoudre l'erreur "npm ci" qui nécessite un package-lock.json et corriger les problèmes de dépendances Rollup.
+- **Section Concernée** : Configuration Docker et Build.
+
+### 2025-10-13
+- **Action** : Correction de la configuration Nginx pour écouter sur le port 12000 au lieu du port 80 par défaut.
+- **Fichiers Impactés** : frontend/nginx.conf (créé), frontend/Dockerfile (modifié).
+- **Pourquoi** : Résoudre l'erreur "connexion réinitialisée" en configurant Nginx pour écouter sur le bon port.
+- **Section Concernée** : Configuration Frontend et Nginx.
+
+### 2025-10-13
+- **Action** : Extension du programme de 14 à 21 jours avec navigation libre entre tous les jours.
+- **Fichiers Impactés** : frontend/src/App.jsx (logique étendue), frontend/src/index.css (styles calendrier).
+- **Pourquoi** : Permettre aux utilisateurs de continuer au-delà des 14 jours initiaux et naviguer librement entre tous les jours.
+- **Section Concernée** : Développement Frontend et Fonctionnalités.
+
+### 2025-10-13
+- **Action** : Transformation complète en calendrier mensuel classique sans limitation de jours.
+- **Fichiers Impactés** : frontend/src/App.jsx (logique calendrier), frontend/src/index.css (styles calendrier mensuel).
+- **Pourquoi** : Supprimer toute limitation et permettre l'accès à tous les jours de l'année avec navigation mensuelle.
+- **Section Concernée** : Développement Frontend et Interface Utilisateur.
+
 ---
 
 *Ajouter de nouvelles entrées ici après chaque modification.*

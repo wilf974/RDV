@@ -8,8 +8,8 @@ WORKDIR /app
 # Copier package.json et package-lock.json
 COPY package*.json ./
 
-# Installer les dépendances
-RUN npm ci --only=production
+# Installer les dépendances (incluant dev pour le build)
+RUN npm install
 
 # Copier le reste du code
 COPY . .
@@ -19,6 +19,9 @@ RUN npm run build
 
 # Étape 2 : Serveur de production avec Nginx
 FROM nginx:alpine
+
+# Copier la configuration Nginx personnalisée
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copier les fichiers buildés vers Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
