@@ -1,96 +1,77 @@
 import React, { useState, useEffect } from 'react';
+import dbStorage from './indexedDBStorage';
 
 /**
- * Fonctions utilitaires pour la persistance multi-couches
- * Gère localStorage, sessionStorage et cookies comme fallback
+ * Fonctions utilitaires pour la persistance robuste avec IndexedDB
+ * Remplace l'ancien système de cookies par IndexedDB
  */
 const isTelegramWebView = () => {
   return window.TelegramWebviewProxy || window.TelegramWebApp;
 };
 
-const setStoredValue = (key, value) => {
+const setStoredValue = async (key, value) => {
   try {
-    localStorage.setItem(key, value);
-    // Sauvegarde également en sessionStorage pour Telegram
+    // Stockage principal avec IndexedDB
+    await dbStorage.setItem(key, value);
+    // Sauvegarde également en sessionStorage pour compatibilité immédiate
     sessionStorage.setItem(key, value);
-    // Sauvegarde en cookie comme fallback
-    document.cookie = `${key}=${value}; path=/; max-age=86400`; // 24h
   } catch (error) {
-    console.warn('Erreur sauvegarde localStorage:', error);
+    console.warn('Erreur sauvegarde IndexedDB:', error);
     try {
       sessionStorage.setItem(key, value);
-      document.cookie = `${key}=${value}; path=/; max-age=86400`;
+      localStorage.setItem(key, value);
     } catch (sessionError) {
-      console.warn('Erreur sauvegarde sessionStorage:', sessionError);
+      console.warn('Erreur sauvegarde fallback:', sessionError);
     }
   }
 };
 
-const getStoredValue = (key) => {
+const getStoredValue = async (key) => {
   try {
-    // Essaie d'abord localStorage
-    const localValue = localStorage.getItem(key);
-    if (localValue) return localValue;
+    // Essaie d'abord IndexedDB
+    const indexedDBValue = await dbStorage.getItem(key);
+    if (indexedDBValue !== null) return indexedDBValue;
 
-    // Fallback vers sessionStorage (utile pour Telegram)
+    // Fallback vers sessionStorage (utile pour accès rapide)
     const sessionValue = sessionStorage.getItem(key);
-    if (sessionValue) return sessionValue;
-
-    // Fallback vers cookies
-    const cookieValue = getCookieValue(key);
-    return cookieValue;
-  } catch (error) {
-    console.warn('Erreur lecture localStorage:', error);
-    try {
-      const sessionValue = sessionStorage.getItem(key);
-      if (sessionValue) return sessionValue;
-      return getCookieValue(key);
-    } catch (sessionError) {
-      console.warn('Erreur lecture sessionStorage:', sessionError);
-      return getCookieValue(key);
+    if (sessionValue) {
+      // Si trouvé dans sessionStorage, le sauver aussi dans IndexedDB
+      await dbStorage.setItem(key, sessionValue);
+      return sessionValue;
     }
-  }
-};
 
-const getCookieValue = (name) => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-  return null;
+    // Dernier fallback vers localStorage
+    const localValue = localStorage.getItem(key);
+    if (localValue) {
+      // Migrer vers IndexedDB
+      await dbStorage.setItem(key, localValue);
+      return localValue;
+    }
+
+    return null;
+  } catch (error) {
+    console.warn('Erreur lecture IndexedDB:', error);
+    // Fallback complet vers localStorage
+    const localValue = localStorage.getItem(key);
+    return localValue;
+  }
 };
 
 /**
  * Composant principal de l'application de Jeûne et Prière 2026.
- * Gère les 7 moments quotidiens avec persistance multi-couches.
+ * Gère les 7 moments quotidiens avec persistance IndexedDB.
  */
-function App() {
-  const [currentMoment, setCurrentMoment] = useState(() => {
-    const saved = getStoredValue('currentMoment');
-    return saved ? parseInt(saved) : 0;
-  });
+function App({ churchSlug, churchConfig }) {
+  const [currentMoment, setCurrentMoment] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60); // 1 minute en secondes
   const [isActive, setIsActive] = useState(false);
-  const [completedMoments, setCompletedMoments] = useState(() => {
-    const saved = getStoredValue('completedMoments');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [completedDays, setCompletedDays] = useState(() => {
-    const saved = getStoredValue('completedDays');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [userId, setUserId] = useState(() => {
-    let id = getStoredValue('userId');
-    if (!id) {
-      id = 'user_' + Math.random().toString(36).substr(2, 9);
-      setStoredValue('userId', id);
-    }
-    return id;
-  });
+  const [completedMoments, setCompletedMoments] = useState([]);
+  const [completedDays, setCompletedDays] = useState([]);
+  const [userId, setUserId] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [currentDay, setCurrentDay] = useState(() => {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const saved = getStoredValue('currentDay');
-    return saved || today;
+    const today = new Date().toISOString().split('T')[0];
+    return today;
   });
   const [selectedDay, setSelectedDay] = useState(null); // Pour la navigation libre
   const [displayMonth, setDisplayMonth] = useState(new Date().getMonth());
@@ -98,28 +79,32 @@ function App() {
 
   // Vérifier et mettre à jour le jour actuel basé sur la date système
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    if (currentDay !== today) {
-      console.log('Mise à jour jour détectée:', currentDay, '->', today);
-      console.log('Environnement Telegram:', isTelegramWebView());
+    const checkAndUpdateDay = async () => {
+      const today = new Date().toISOString().split('T')[0];
+      if (currentDay !== today) {
+        console.log('Mise à jour jour détectée:', currentDay, '->', today);
+        console.log('Environnement Telegram:', isTelegramWebView());
 
-      // Vérifier si le jour actuel était déjà terminé
-      const wasDayCompleted = completedDays.includes(currentDay);
+        // Vérifier si le jour actuel était déjà terminé
+        const wasDayCompleted = completedDays.includes(currentDay);
 
-      setCurrentDay(today);
-      setStoredValue('currentDay', today);
+        setCurrentDay(today);
+        await setStoredValue('currentDay', today);
 
-      // Réinitialiser les moments pour le nouveau jour seulement si le jour précédent était terminé
-      if (wasDayCompleted) {
-        setCurrentMoment(0);
-        setStoredValue('currentMoment', '0');
-        setCompletedMoments([]);
-        setStoredValue('completedMoments', JSON.stringify([]));
-        console.log('Jour mis à jour automatiquement - Moments réinitialisés :', today);
-      } else {
-        console.log('Jour mis à jour mais moments conservés pour permettre la reprise :', today);
+        // Réinitialiser les moments pour le nouveau jour seulement si le jour précédent était terminé
+        if (wasDayCompleted) {
+          setCurrentMoment(0);
+          await setStoredValue('currentMoment', '0');
+          setCompletedMoments([]);
+          await setStoredValue('completedMoments', JSON.stringify([]));
+          console.log('Jour mis à jour automatiquement - Moments réinitialisés :', today);
+        } else {
+          console.log('Jour mis à jour mais moments conservés pour permettre la reprise :', today);
+        }
       }
-    }
+    };
+
+    checkAndUpdateDay();
   }, [currentDay, completedDays]); // Ajout completedDays comme dépendance
 
   const moments = [
@@ -153,53 +138,87 @@ function App() {
     }
   ];
 
+  // Chargement initial des données depuis IndexedDB
   useEffect(() => {
-    // Charger les moments terminés depuis le système de persistance multi-couches
-    const savedCompletedMoments = getStoredValue('completedMoments');
-    const savedCompletedDays = getStoredValue('completedDays');
-    const savedCurrentDay = getStoredValue('currentDay');
+    const loadInitialData = async () => {
+      try {
+        const today = new Date().toISOString().split('T')[0];
 
-    const loadedCompletedMoments = savedCompletedMoments ? JSON.parse(savedCompletedMoments) : [];
-    const loadedCompletedDays = savedCompletedDays ? JSON.parse(savedCompletedDays) : [];
+        // Charger toutes les données depuis IndexedDB
+        const savedCurrentMoment = await getStoredValue('currentMoment');
+        const savedCompletedMoments = await getStoredValue('completedMoments');
+        const savedCompletedDays = await getStoredValue('completedDays');
+        const savedCurrentDay = await getStoredValue('currentDay');
+        let savedUserId = await getStoredValue('userId');
 
-    // Vérifier si le jour sauvegardé correspond au jour actuel
-    const today = new Date().toISOString().split('T')[0];
-    if (savedCurrentDay && savedCurrentDay !== today) {
-      // Jour différent - vérifier si le jour sauvegardé était terminé
-      if (loadedCompletedDays.includes(savedCurrentDay)) {
-        // Le jour précédent était terminé - réinitialiser pour aujourd'hui
-        console.log('Jour précédent terminé - réinitialisation pour aujourd\'hui');
-        setCompletedMoments([]);
-        setStoredValue('completedMoments', JSON.stringify([]));
-        setCurrentMoment(0);
-        setStoredValue('currentMoment', '0');
-      } else {
-        // Jour précédent non terminé - conserver les moments en cours
-        console.log('Reprise des moments en cours du jour précédent');
+        // Générer un ID utilisateur si nécessaire
+        if (!savedUserId) {
+          savedUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+          await setStoredValue('userId', savedUserId);
+        }
+        setUserId(savedUserId);
+
+        const loadedCompletedMoments = savedCompletedMoments
+          ? (typeof savedCompletedMoments === 'string' ? JSON.parse(savedCompletedMoments) : savedCompletedMoments)
+          : [];
+        const loadedCompletedDays = savedCompletedDays
+          ? (typeof savedCompletedDays === 'string' ? JSON.parse(savedCompletedDays) : savedCompletedDays)
+          : [];
+
+        // Vérifier si le jour sauvegardé correspond au jour actuel
+        if (savedCurrentDay && savedCurrentDay !== today) {
+          // Jour différent - vérifier si le jour sauvegardé était terminé
+          if (loadedCompletedDays.includes(savedCurrentDay)) {
+            // Le jour précédent était terminé - réinitialiser pour aujourd'hui
+            console.log('Jour précédent terminé - réinitialisation pour aujourd\'hui');
+            setCompletedMoments([]);
+            await setStoredValue('completedMoments', JSON.stringify([]));
+            setCurrentMoment(0);
+            await setStoredValue('currentMoment', '0');
+            setCurrentDay(today);
+            await setStoredValue('currentDay', today);
+          } else {
+            // Jour précédent non terminé - conserver les moments en cours
+            console.log('Reprise des moments en cours du jour précédent');
+            setCurrentMoment(savedCurrentMoment ? parseInt(savedCurrentMoment) : 0);
+            setCompletedMoments(loadedCompletedMoments);
+            setCurrentDay(savedCurrentDay || today);
+          }
+        } else {
+          // Même jour - restaurer l'état
+          setCurrentMoment(savedCurrentMoment ? parseInt(savedCurrentMoment) : 0);
+          setCompletedMoments(loadedCompletedMoments);
+          setCurrentDay(savedCurrentDay || today);
+        }
+
+        setCompletedDays(loadedCompletedDays);
+
+        console.log('Données chargées depuis IndexedDB:', {
+          currentMoment: savedCurrentMoment,
+          completedMoments: loadedCompletedMoments,
+          completedDays: loadedCompletedDays,
+          currentDay: savedCurrentDay,
+          today: today,
+          telegram: isTelegramWebView()
+        });
+      } catch (error) {
+        console.error('Erreur chargement données:', error);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
 
-    setCompletedMoments(loadedCompletedMoments);
-    setCompletedDays(loadedCompletedDays);
-
-    console.log('Données chargées:', {
-      completedMoments: loadedCompletedMoments,
-      completedDays: loadedCompletedDays,
-      currentDay: savedCurrentDay,
-      today: today,
-      telegram: isTelegramWebView()
-    });
-    setIsLoading(false);
-  }, []); // Pas de dépendance sur userId pour éviter rechargement
+    loadInitialData();
+  }, []); // Pas de dépendance pour éviter rechargement
 
   // Sauvegarde automatique lors du déchargement (important pour Telegram)
   useEffect(() => {
-    const handleBeforeUnload = () => {
+    const handleBeforeUnload = async () => {
       console.log('Sauvegarde avant fermeture...');
-      setStoredValue('currentMoment', currentMoment.toString());
-      setStoredValue('completedMoments', JSON.stringify(completedMoments));
-      setStoredValue('completedDays', JSON.stringify(completedDays));
-      setStoredValue('currentDay', currentDay);
+      await setStoredValue('currentMoment', currentMoment.toString());
+      await setStoredValue('completedMoments', JSON.stringify(completedMoments));
+      await setStoredValue('completedDays', JSON.stringify(completedDays));
+      await setStoredValue('currentDay', currentDay);
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -217,7 +236,7 @@ function App() {
             alert("Temps écoulé ! Moment terminé.");
             const newCompleted = [...completedMoments, currentMoment];
             setCompletedMoments(newCompleted);
-            localStorage.setItem('completedMoments', JSON.stringify(newCompleted));
+            setStoredValue('completedMoments', JSON.stringify(newCompleted)); // Fire and forget
             // Validation automatique du jour
             if (newCompleted.length === moments.length) {
               markMomentCompleted();
@@ -237,42 +256,42 @@ function App() {
     setIsActive(true);
   };
 
-  const nextMoment = () => {
+  const nextMoment = async () => {
     if (currentMoment < moments.length - 1) {
       const newMoment = currentMoment + 1;
       setCurrentMoment(newMoment);
-      setStoredValue('currentMoment', newMoment.toString());
+      await setStoredValue('currentMoment', newMoment.toString());
       setTimeLeft(60);
       setIsActive(false);
     }
   };
 
   // Fonction pour changer de jour librement
-  const changeDay = (dayDate) => {
+  const changeDay = async (dayDate) => {
     if (confirm(`Voulez-vous passer au ${dayDate} ? Vos progrès actuels seront sauvegardés.`)) {
       setCurrentDay(dayDate);
-      setStoredValue('currentDay', dayDate);
+      await setStoredValue('currentDay', dayDate);
       setCurrentMoment(0);
-      setStoredValue('currentMoment', '0');
+      await setStoredValue('currentMoment', '0');
       setCompletedMoments([]);
-      setStoredValue('completedMoments', JSON.stringify([]));
+      await setStoredValue('completedMoments', JSON.stringify([]));
       setTimeLeft(60);
       setIsActive(false);
       setSelectedDay(null);
     }
   };
 
-  const markMomentCompleted = () => {
+  const markMomentCompleted = async () => {
     const newCompleted = [...completedMoments, currentMoment];
     setCompletedMoments(newCompleted);
-    setStoredValue('completedMoments', JSON.stringify(newCompleted));
+    await setStoredValue('completedMoments', JSON.stringify(newCompleted));
 
     // Si tous les moments du jour actuel sont terminés, marquer le jour comme terminé
     if (newCompleted.length === moments.length) {
       console.log('Tous les moments du jour terminés, validation du jour :', currentDay);
       const newCompletedDays = [...completedDays, currentDay];
       setCompletedDays(newCompletedDays);
-      setStoredValue('completedDays', JSON.stringify(newCompletedDays));
+      await setStoredValue('completedDays', JSON.stringify(newCompletedDays));
 
       // Préparer le jour suivant
       const nextDay = new Date(currentDay);
@@ -281,11 +300,11 @@ function App() {
 
       // Tous les jours sont maintenant disponibles (21 jours)
       setCurrentDay(nextDayStr);
-      setStoredValue('currentDay', nextDayStr);
+      await setStoredValue('currentDay', nextDayStr);
       setCurrentMoment(0);
-      setStoredValue('currentMoment', '0');
+      await setStoredValue('currentMoment', '0');
       setCompletedMoments([]); // Réinitialiser pour le nouveau jour
-      setStoredValue('completedMoments', JSON.stringify([]));
+      await setStoredValue('completedMoments', JSON.stringify([]));
       alert('Félicitations ! Tous les moments terminés. Jour suivant débloqué.');
     }
   };
@@ -398,12 +417,12 @@ function App() {
               if (isAllMomentsCompleted || (isButtonsDisabled && currentMoment === 0 && completedMoments.length > 0)) {
                 return (
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       if (confirm('Êtes-vous sûr de vouloir recommencer la journée ? Tous les moments terminés seront remis à zéro.')) {
                         setCompletedMoments([]);
-                        setStoredValue('completedMoments', JSON.stringify([]));
+                        await setStoredValue('completedMoments', JSON.stringify([]));
                         setCurrentMoment(0);
-                        setStoredValue('currentMoment', '0');
+                        await setStoredValue('currentMoment', '0');
                         setTimeLeft(60);
                         setIsActive(false);
                       }
@@ -470,16 +489,16 @@ function App() {
               )}
               {completedMoments.length === moments.length && (
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     console.log('Réinitialisation forcée pour Telegram');
                     // Forcer la réinitialisation en simulant un nouveau jour
                     const today = new Date().toISOString().split('T')[0];
                     setCurrentDay(today);
-                    setStoredValue('currentDay', today);
+                    await setStoredValue('currentDay', today);
                     setCurrentMoment(0);
-                    setStoredValue('currentMoment', '0');
+                    await setStoredValue('currentMoment', '0');
                     setCompletedMoments([]);
-                    setStoredValue('completedMoments', JSON.stringify([]));
+                    await setStoredValue('completedMoments', JSON.stringify([]));
                     setTimeLeft(60);
                     setIsActive(false);
                     alert('Réinitialisation forcée effectuée ! Les boutons devraient maintenant être accessibles.');
